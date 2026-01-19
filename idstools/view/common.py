@@ -102,10 +102,15 @@ class PlotCanvas:
 
     def show(self, *args, **kwargs):
         wm = self.get_current_fig_manager()
-        window = wm.window
-        screen_y = window.winfo_screenheight()
-        screen_x = window.winfo_screenwidth()
-        wm.resize(screen_x, screen_y)
+        try:
+            # Try to maximize the window (only works with TkAgg backend)
+            window = wm.window
+            screen_y = window.winfo_screenheight()
+            screen_x = window.winfo_screenwidth()
+            wm.resize(screen_x, screen_y)
+        except AttributeError:
+            # Backend doesn't support window resizing (e.g., 'agg', 'Qt', etc.)
+            logger.debug("Window resizing not supported for current matplotlib backend")
         plt.show(*args, **kwargs)
 
     def get_current_fig_manager(self):
