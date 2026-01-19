@@ -254,9 +254,7 @@ def get_ids_size(db_entry_object, ids_names=None, dd_update=False, ignore_empty=
                     )
                     del ids_object
             except Exception as e:
-                logger.warning(
-                    f"Failed to retrieve IDS '{ids_name}' with occurrence {o}: {str(e)}. Skipping this IDS."
-                )
+                logger.warning(f"Failed to retrieve IDS '{ids_name}' with occurrence {o}: {str(e)}. Skipping this IDS.")
     return ids_size_dict
 
 
