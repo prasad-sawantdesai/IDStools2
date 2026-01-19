@@ -436,10 +436,14 @@ def get_available_ids_and_times(db_entry_object, dd_update=False) -> list:
             try:
 
                 if dd_update:
-                    ids_object = db_entry_object.get(_ids_name, occurrence=occurrence, autoconvert=False, ignore_unknown_dd_version=True)
+                    ids_object = db_entry_object.get(
+                        _ids_name, occurrence=occurrence, autoconvert=False, ignore_unknown_dd_version=True
+                    )
                     ids_object = imas.convert_ids(ids_object, db_entry_object.factory.version)
                 else:
-                    ids_object = db_entry_object.get(_ids_name, occurrence=occurrence, lazy=True, autoconvert=False, ignore_unknown_dd_version=True)
+                    ids_object = db_entry_object.get(
+                        _ids_name, occurrence=occurrence, lazy=True, autoconvert=False, ignore_unknown_dd_version=True
+                    )
 
                 homogeneous_time = ids_object.ids_properties.homogeneous_time
                 if homogeneous_time == imas.ids_defs.IDS_TIME_MODE_UNKNOWN:
