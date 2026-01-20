@@ -83,9 +83,7 @@ if __name__ == "__main__":
                 if idsname != args.ids:
                     continue
 
-            ids = connection.get(
-                idsname, occurrence=oc, lazy=True, autoconvert=False, ignore_unknown_dd_version=True
-            )
+            ids = connection.get(idsname, occurrence=oc, lazy=True, autoconvert=False, ignore_unknown_dd_version=True)
             homogeneous_time = ids.ids_properties.homogeneous_time
             if getattr(ids, "time", None) is None:
                 times = None
@@ -130,9 +128,7 @@ if __name__ == "__main__":
         table = Table(title="List of IDSes with occurrences and comments")
         table.add_column("IDS", style="magenta")
         table.add_column("COMMENT", style="green")
-        for idsname, oc, comment in get_available_ids_and_occurrences(
-            connection, get_comment=True
-        ):
+        for idsname, oc, comment in get_available_ids_and_occurrences(connection, get_comment=True):
             # If user wants to check specific ids type
             if args.ids:
                 if idsname != args.ids:
@@ -151,9 +147,7 @@ if __name__ == "__main__":
         table = Table(title="List of IDSes with Occurrences and DD Version")
         table.add_column("IDS", style="magenta")
         table.add_column("DD VERSION", style="green")
-        for idsname, oc, dd_version in get_available_ids_and_occurrences(
-            connection, get_version=True
-        ):
+        for idsname, oc, dd_version in get_available_ids_and_occurrences(connection, get_version=True):
             # If user wants to check specific ids type
             if args.ids:
                 if idsname != args.ids:
