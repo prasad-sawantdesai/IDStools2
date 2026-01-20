@@ -5,10 +5,9 @@ import sys
 import matplotlib
 
 # Always use non-GUI backend in headless environments or when tkinter is not available
-if "DISPLAY" not in os.environ:
-    matplotlib.use("agg")
-else:
-    # Check if tkinter is available
+# On Windows, DISPLAY is not typically set, so check platform
+if sys.platform.startswith("win") or "DISPLAY" in os.environ:
+    # Windows or Unix/Linux with DISPLAY - try TkAgg
     try:
         import tkinter  # noqa: F401 - imported to check availability
 
@@ -16,6 +15,9 @@ else:
     except (ImportError, ModuleNotFoundError):
         # tkinter not available, use non-GUI backend
         matplotlib.use("agg")
+else:
+    # Unix/Linux without DISPLAY
+    matplotlib.use("agg")
 
 import matplotlib.pyplot as plt
 
