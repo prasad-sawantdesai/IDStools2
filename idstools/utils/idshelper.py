@@ -346,7 +346,6 @@ def get_available_ids_and_occurrences(
     db_entry_object,
     time_mode=None,
     get_comment=False,
-    dd_update=False,
     get_version=False,
 ):
     """
@@ -357,7 +356,6 @@ def get_available_ids_and_occurrences(
             which available IDSs will be looked for.
         time_mode: The time mode of interest for the IDSs in the given DBEntry.
         get_comment: Output ids_properties.comment field for each found occurrence
-        dd_update (bool, optional): Flag to indicate whether to update the data dictionary. Defaults to False.
         get_version: Whether to return version information
 
     Returns:
@@ -378,11 +376,9 @@ def get_available_ids_and_occurrences(
             occ_type = ""
 
             try:
-                if dd_update:
-                    ids_object = db_entry_object.get(idstype, occurrence=occ, autoconvert=False)
-                    ids_object = imas.convert_ids(ids_object, db_entry_object.factory.version)
-                else:
-                    ids_object = db_entry_object.get(idstype, occurrence=occ, lazy=True, autoconvert=False)
+                ids_object = db_entry_object.get(
+                    idstype, occurrence=occ, lazy=True, autoconvert=False, ignore_unknown_dd_version=True
+                )
 
                 dd_version = ids_object.ids_properties.version_put.data_dictionary.value
                 homogeneous_time = ids_object.ids_properties.homogeneous_time
@@ -411,7 +407,7 @@ def get_available_ids_and_occurrences(
     return availableidslist
 
 
-def get_available_ids_and_times(db_entry_object, dd_update=False) -> list:
+def get_available_ids_and_times(db_entry_object) -> list:
     """
     The function `get_available_ids_and_times` retrieves available IDS names and corresponding time
     arrays from a given `db_entry_object`.
@@ -435,15 +431,9 @@ def get_available_ids_and_times(db_entry_object, dd_update=False) -> list:
             time_array = None
             try:
 
-                if dd_update:
-                    ids_object = db_entry_object.get(
-                        _ids_name, occurrence=occurrence, autoconvert=False, ignore_unknown_dd_version=True
-                    )
-                    ids_object = imas.convert_ids(ids_object, db_entry_object.factory.version)
-                else:
-                    ids_object = db_entry_object.get(
-                        _ids_name, occurrence=occurrence, lazy=True, autoconvert=False, ignore_unknown_dd_version=True
-                    )
+                ids_object = db_entry_object.get(
+                    _ids_name, occurrence=occurrence, lazy=True, autoconvert=False, ignore_unknown_dd_version=True
+                )
 
                 homogeneous_time = ids_object.ids_properties.homogeneous_time
                 if homogeneous_time == imas.ids_defs.IDS_TIME_MODE_UNKNOWN:
