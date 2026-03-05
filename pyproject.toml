@@ -101,7 +101,9 @@ ignore = ["E203", "W503"]
 # these self-dependencies are available since pip 21.2
 all = ["imas-idstools[test,docs]"]
 docs = [
+    ".",
     "sphinx>=6.0.0,<7.0.0",
+    "astroid<4",
     "numpy",
     "pyparsing",
     "python-dateutil",

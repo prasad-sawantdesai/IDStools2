@@ -104,7 +104,6 @@ To build the *IDStools* documentation, execute:
 
    $ pip install .[docs]
    $ make -C docs realclean
-   $ make -C docs autogen
    $ make -C docs html
    $ make -C docs man
 
