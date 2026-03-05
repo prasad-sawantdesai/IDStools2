@@ -62,8 +62,9 @@ class WavesCompute:
 
                 connection = imas.DBEntry("imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3","r")
                 idsObj = connection.get('waves')
-                waveobj = WavesCompute(waves_ids)
-                print(waveobj.getBResonance())
+                connection.close()
+                waveobj = WavesCompute(idsObj)
+                print(waveobj.get_b_resonance(coherent_wave_index=0, time_slice=0))
 
                 [6.0750547938792625, 3.0375273969396313, 2.025018264626421, 1.5187636984698156]
         """
@@ -93,8 +94,9 @@ class WavesCompute:
 
                 connection = imas.DBEntry("imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3","r")
                 idsObj = connection.get('waves')
-                waveobj = WavesCompute(waves_ids)
-                print(waveobj.getBeamArray())
+                connection.close()
+                waveobj = WavesCompute(idsObj)
+                print(waveobj.get_beam_array())
 
                 [ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9. 10.]
         """
@@ -127,8 +129,9 @@ class WavesCompute:
 
                 connection = imas.DBEntry("imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3","r")
                 idsObj = connection.get('waves')
-                waveobj = WavesCompute(waves_ids)
-                print(waveobj.getOmegaEC())
+                connection.close()
+                waveobj = WavesCompute(idsObj)
+                print(waveobj.get_omega_ec(coherent_wave_index=0, time_slice=0))
 
                 1068141502220.5297
         """
@@ -157,8 +160,9 @@ class WavesCompute:
 
                 connection = imas.DBEntry("imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3","r")
                 idsObj = connection.get('waves')
-                waveobj = WavesCompute(waves_ids)
-                print(waveobj.get_beams())
+                connection.close()
+                waveobj = WavesCompute(idsObj)
+                print(waveobj.get_beams(time_slice=0))
 
                 {0: {'active': True, 'total_beams': 5},
                 1: {'active': True, 'total_beams': 5},
@@ -207,8 +211,9 @@ class WavesCompute:
 
                 connection = imas.DBEntry("imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3","r")
                 idsObj = connection.get('waves')
-                waveobj = WavesCompute(waves_ids)
-                print(waveobj.getBeamTracing())
+                connection.close()
+                waveobj = WavesCompute(idsObj)
+                print(waveobj.get_beam_tracing(time_slice=0))
         """
         # Count number of active beams and their number of rays
         beams_dict = self.get_beams(time_slice)

@@ -49,9 +49,12 @@ class EdgeProfilesCompute:
             .. code-block:: python
 
                 import imas
-                connection = imas.DBEntry("imas:mdsplus?user=public;pulse=123276;run=1;database=ITER;version=3", "r")
+                from idstools.compute.edge_profiles import EdgeProfilesCompute
+
+                connection = imas.DBEntry(\"imas:mdsplus?user=public;pulse=123276;run=1;database=ITER;version=3\", \"r\")
                 idsObj = connection.get('edge_profiles')
-                result = EdgeProfilesCompute.getPlasmaCompositionWithSpeciesConcentration(idsObj, 0)
+                connection.close()
+                result = EdgeProfilesCompute.get_plasma_composition_with_species_concentration(idsObj, 0)
 
                 {'0':
                     {'a': 2.0,
