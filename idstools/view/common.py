@@ -82,7 +82,7 @@ class PlotCanvas:
             col (int, optional): Column index in the grid (0-indexed). Defaults to 0.
             rowspan (int, optional): Number of rows this axes spans. Defaults to 1.
             colspan (int, optional): Number of columns this axes spans. Defaults to 1.
-            **kwargs: Additional keyword arguments passed to plt.subplot2grid().
+            kwargs: Additional keyword arguments passed to plt.subplot2grid().
 
         Returns:
             matplotlib.axes.Axes: The created axes object for plotting.
@@ -185,8 +185,8 @@ class PlotCanvas:
 
         Args:
             text (str, optional): Super-title text. Defaults to empty string.
-            *args: Positional arguments passed to matplotlib's suptitle().
-            **kwargs: Keyword arguments (e.g., fontsize, color) passed to matplotlib's suptitle().
+            args: Positional arguments passed to matplotlib's suptitle().
+            kwargs: Keyword arguments (e.g., fontsize, color) passed to matplotlib's suptitle().
 
         Returns:
             None
@@ -205,8 +205,8 @@ class PlotCanvas:
         supported by the current matplotlib backend, the figure is displayed normally.
 
         Args:
-            *args: Positional arguments passed to plt.show().
-            **kwargs: Keyword arguments passed to plt.show().
+            args: Positional arguments passed to plt.show().
+            kwargs: Keyword arguments passed to plt.show().
 
         Returns:
             None
