@@ -51,7 +51,8 @@ class EdgeProfilesCompute:
                 import imas
                 from idstools.compute.edge_profiles import EdgeProfilesCompute
 
-                connection = imas.DBEntry(\"imas:mdsplus?user=public;pulse=123276;run=1;database=ITER;version=3\", \"r\")
+                connection = imas.DBEntry(
+                    \"imas:mdsplus?user=public;pulse=123276;run=1;database=ITER;version=3\", \"r\")
                 idsObj = connection.get('edge_profiles')
                 connection.close()
                 result = EdgeProfilesCompute.get_plasma_composition_with_species_concentration(idsObj, 0)

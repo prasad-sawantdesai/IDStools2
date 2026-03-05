@@ -460,7 +460,7 @@ class Terminal:
 
         Args:
             text (str or dict): Text string to print, or dictionary to pretty-print.
-            style (str, optional): Rich text styling (e.g., 'green', 'bold red'). 
+            style (str, optional): Rich text styling (e.g., 'green', 'bold red').
                 Defaults to 'green' if Rich is available.
             panel (bool, optional): If True, text is displayed in a Rich panel box.
                 Ignored if Rich is unavailable. Defaults to False.
