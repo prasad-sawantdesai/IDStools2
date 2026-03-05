@@ -159,11 +159,11 @@ html_logo = "_static/idstools-48.png"
 #     "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
 # }
 html_theme_options = {
-    "site_url": "https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/idstools-doc/latest.html",
-    "repo_url": "https://git.iter.org/projects/IMAS/repos/idstools",
+    "site_url": "https://idstools.readthedocs.io/",
+    "repo_url": "https://github.com/iterorganization/IDStools",
     "repo_name": "IDStools",
     "icon": {
-        "repo": "fontawesome/brands/bitbucket",
+        "repo": "fontawesome/brands/github",
     },
     "features": [
         # "navigation.expand",

@@ -1,7 +1,7 @@
 """
 This module provides compute functions and classes for summary ids data
 
-`more about summary ids <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Data%20Model/CI/latest.html>`_.
+`more about summary ids <https://imas-data-dictionary.readthedocs.io/en/latest/>`_.
 
 """
 

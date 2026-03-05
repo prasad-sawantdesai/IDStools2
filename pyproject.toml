@@ -65,7 +65,7 @@ dynamic = ["version"]
 
 
 [project.urls]
-homepage = "https://git.iter.org/projects/IMAS/repos/idstools/browse"
+homepage = "https://github.com/iterorganization/IDStools"
 
 [tool.setuptools.packages.find]
 where = ["."]
