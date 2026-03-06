@@ -13,6 +13,13 @@ logger = logging.getLogger("module")
 
 
 class CoreTransportCompute:
+    """This class provides compute functions for core transport ids.
+    
+    Attributes:
+        ids (object): The core transport IDS (Integrated Data Structure) object containing 
+            transport coefficients and flux data describing particle and energy transport
+            in the core plasma region.
+    """
     def __init__(self, ids):
         self.ids = ids
 

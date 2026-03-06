@@ -13,7 +13,13 @@ logger = logging.getLogger("module")
 
 
 class PfActiveCompute:
-    """This class provides compute functions for pf_active ids"""
+    """This class provides compute functions for pf_active ids.
+    
+    Attributes:
+        ids (object): The PF active IDS (Integrated Data Structure) object containing 
+            active poloidal field coil data including coil geometry, electrical properties,
+            and control information.
+    """
 
     def __init__(self, ids: object):
         """Initialization PfActiveCompute object.

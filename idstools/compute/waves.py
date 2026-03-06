@@ -14,7 +14,13 @@ logger = logging.getLogger("module")
 
 
 class WavesCompute:
-    """This class provides compute functions for waves ids"""
+    """This class provides compute functions for waves ids.
+    
+    Attributes:
+        ids (object): The waves IDS (Integrated Data Structure) object containing 
+            radiofrequency and microwave heating system data including antenna properties,
+            power delivery, and wave propagation information.
+    """
 
     def __init__(self, ids):
         """Initialization WavesCompute object.
