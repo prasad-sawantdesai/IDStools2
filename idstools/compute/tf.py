@@ -17,9 +17,9 @@ logger = logging.getLogger("module")
 
 class TFCompute:
     """This class provides compute functions for tf ids.
-    
+
     Attributes:
-        ids (object): The toroidal field (TF) IDS (Integrated Data Structure) object 
+        ids (object): The toroidal field (TF) IDS (Integrated Data Structure) object
             containing toroidal field coil data including coil geometry, conductors,
             electrical properties, and mechanical support information.
     """

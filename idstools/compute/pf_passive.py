@@ -14,9 +14,9 @@ logger = logging.getLogger("module")
 
 class PfPassiveCompute:
     """This class provides compute functions for pf_passive ids.
-    
+
     Attributes:
-        ids (object): The PF passive IDS (Integrated Data Structure) object containing 
+        ids (object): The PF passive IDS (Integrated Data Structure) object containing
             passive poloidal field loop data including loop geometry, mechanical properties,
             and electromagnetic response parameters.
     """

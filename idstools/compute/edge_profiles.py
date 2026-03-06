@@ -20,12 +20,13 @@ logger = logging.getLogger("module")
 
 class EdgeProfilesCompute:
     """This class provides compute functions for edge profiles ids.
-    
+
     Attributes:
-        ids (object): The edge profiles IDS (Integrated Data Structure) object containing 
+        ids (object): The edge profiles IDS (Integrated Data Structure) object containing
             edge and scrape-off layer plasma profile data including density, temperature,
             and potential profiles near the plasma boundary.
     """
+
     def __init__(self, ids):
         self.ids = ids
 

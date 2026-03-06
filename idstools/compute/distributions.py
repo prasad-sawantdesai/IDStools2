@@ -10,9 +10,9 @@ logger = logging.getLogger("module")
 
 class DistributionsCompute:
     """This class provides compute functions for distributions ids.
-    
+
     Attributes:
-        ids (object): The distributions IDS (Integrated Data Structure) object containing 
+        ids (object): The distributions IDS (Integrated Data Structure) object containing
             fast particle and energetic ion distribution functions.
         ndistributions (int): Number of distributions in the ids object.
         nrho (int): Number of radial grid points (calculated).
@@ -22,6 +22,7 @@ class DistributionsCompute:
         radial_grid_info (object): Radial grid information (calculated).
         is_radial_grid_info_processed (bool): Flag indicating if radial grid info has been processed.
     """
+
     def __init__(self, ids):
         self.ids = ids
 

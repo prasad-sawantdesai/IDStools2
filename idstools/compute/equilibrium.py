@@ -21,9 +21,9 @@ logger = logging.getLogger("module")
 
 class EquilibriumCompute:
     """This class provides compute functions for equilibrium ids.
-    
+
     Attributes:
-        ids (object): The equilibrium IDS (Integrated Data Structure) object containing 
+        ids (object): The equilibrium IDS (Integrated Data Structure) object containing
             time-resolved equilibrium data including profiles, magnetic field information,
             constraints, and boundary information.
     """

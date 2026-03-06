@@ -15,9 +15,9 @@ EMPTY_DOUBLE = -9e40
 
 class SummaryCompute:
     """This class provides compute functions for summary ids.
-    
+
     Attributes:
-        ids (object): The summary IDS (Integrated Data Structure) object containing 
+        ids (object): The summary IDS (Integrated Data Structure) object containing
             high-level summary data and indices providing quick access to important
             discharge parameters and data references.
     """
