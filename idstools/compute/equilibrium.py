@@ -81,9 +81,7 @@ class EquilibriumCompute:
         psi2d = profiles2d.psi
 
         if profiles2d.grid_type.index == 1 and np.size(r2d) == 0:
-            logger.warning(
-                f"profiles_2d[{profiles2d_index}].r not available (grid_type=1), using grid.dim1/dim2"
-            )
+            logger.warning(f"profiles_2d[{profiles2d_index}].r not available (grid_type=1), using grid.dim1/dim2")
             r2d = profiles2d.grid.dim1
             z2d = profiles2d.grid.dim2
 
