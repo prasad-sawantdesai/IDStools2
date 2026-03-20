@@ -86,14 +86,7 @@ class EquilibriumCompute:
             )
             r1d = profiles2d.grid.dim1
             z1d = profiles2d.grid.dim2
-            nr = len(r1d)
-            nz = len(z1d)
-            r2d = np.empty(shape=(nr, nz))
-            z2d = np.empty(shape=(nr, nz))
-            for iz in range(nz):
-                r2d[:, iz] = r1d
-            for ir in range(nr):
-                z2d[ir, :] = z1d
+            r2d, z2d = np.meshgrid(r1d, z1d)
 
         if np.all(psi2d == 0.0):
             logger.error(
