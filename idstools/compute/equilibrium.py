@@ -82,21 +82,14 @@ class EquilibriumCompute:
 
         if profiles2d.grid_type.index == 1 and np.size(r2d) == 0:
             logger.warning(
-                f"profiles_2d[{profiles2d_index}].r is not available and grid type is 1.. Calculating from grid"
+                f"profiles_2d[{profiles2d_index}].r not available (grid_type=1), using grid.dim1/dim2"
             )
-            r1d = profiles2d.grid.dim1
-            z1d = profiles2d.grid.dim2
-            r2d, z2d = np.meshgrid(r1d, z1d)
+            r2d = profiles2d.grid.dim1
+            z2d = profiles2d.grid.dim2
 
         if np.all(psi2d == 0.0):
             logger.error(
                 "All values of psi2d are 0. No contour levels were found within the data range, Can not plot contour"
-            )
-            return None
-        if np.size(r2d) != np.size(z2d) or np.size(r2d) != np.size(psi2d):
-            logger.error(
-                f"r, z and psi have not the same dimension in \
-                equilibrium.time_slice[{time_slice}].profiles_2d[{profiles2d_index}]"
             )
             return None
 
