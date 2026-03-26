@@ -41,49 +41,49 @@ class EquilibriumCompute:
         This function returns a dictionary containing 2D Cartesian grid coordinates and psi values from
         an equilibrium IDS object.
 
-
         Args:
             time_slice (int): The time slice index of the equilibrium data to be used for generating the
-                2D Cartesian grid. Defaults to 0
-            profiles2d_index (int): `profiles2d_index` is an integer parameter that represents the index of the
-                ``profile_2d`` to be used in the calculation. It is used to access the specific 2D profile from the
-                list of profiles in the `time_slice` object. Defaults to 0
+            2D Cartesian grid. Defaults to 0
+            profiles2d_index (int): An integer parameter that represents the index of the
+            ``profiles_2d`` to be used in the calculation. It is used to access the specific 2D profile from the
+            list of profiles in the `time_slice` object. Defaults to 0
 
         Returns:
             A dictionary containing the 2D Cartesian grid coordinates (r2d and z2d) and the corresponding psi
-            values (psi2d).
+            values (psi2d), or None if the data is unavailable or invalid.
 
         Example:
             .. code-block:: python
 
-                import imas
-                connection = imas.DBEntry("imas:mdsplus?user=public;pulse=134173;run=106;database=ITER;version=3","r")
-                idsObj = connection.get('equilibrium')
-                computeObj = EquilibriumCompute(idsObj)
-                result = computeObj.get2d_cartesian_grid(time_slice=0)
+            import imas
+            connection = imas.DBEntry("imas:mdsplus?user=public;pulse=134173;run=106;database=ITER;version=3","r")
+            idsObj = connection.get('equilibrium')
+            computeObj = EquilibriumCompute(idsObj)
+            result = computeObj.get2d_cartesian_grid(time_slice=0)
 
-                {'psi2d': array([[]]),
-                'r2d': array([[]]),
-                'z2d': array([[]])}
+            {'r2d': array([...]), 'z2d': array([...]), 'psi2d': array([...])}
         """
-        profiles2d = None
+        profiles2d = r1d = z1d = None
         try:
-            profiles2d = self.ids.time_slice[time_slice].profiles_2d[
-                profiles2d_index
-            ]  # using https://docs.python.org/2/glossary.html#term-eafp style
+            profiles2d = self.ids.time_slice[time_slice].profiles_2d[profiles2d_index]
         except IndexError:
             logger.error(f"equilibrium.time_slice[{time_slice}].profiles_2d[{profiles2d_index}] is not available")
             return None
 
         profiles2d = self.ids.time_slice[time_slice].profiles_2d[profiles2d_index]
-        r2d = profiles2d.r
-        z2d = profiles2d.z
-        psi2d = profiles2d.psi
 
-        if profiles2d.grid_type.index == 1 and np.size(r2d) == 0:
-            logger.warning(f"profiles_2d[{profiles2d_index}].r not available (grid_type=1), using grid.dim1/dim2")
-            r2d = profiles2d.grid.dim1
-            z2d = profiles2d.grid.dim2
+        if profiles2d.grid_type.index == 1 and profiles2d.grid.dim1 is not None and profiles2d.grid.dim2 is not None:
+            logger.info(
+                f"Using equilibrium.time_slice[{time_slice}]"
+                f".profiles_2d[{profiles2d_index}].grid.dim1/dim2 for the 2D grid"
+            )
+            r1d = profiles2d.grid.dim1
+            z1d = profiles2d.grid.dim2
+        else:
+            logger.error("Only rectangular cylindrical grid (grid_type=1) is supported for now")
+            return None
+
+        psi2d = profiles2d.psi
 
         if np.all(psi2d == 0.0):
             logger.error(
@@ -91,7 +91,7 @@ class EquilibriumCompute:
             )
             return None
 
-        return {"r2d": r2d, "z2d": z2d, "psi2d": psi2d}
+        return {"r2d": r1d, "z2d": z1d, "psi2d": psi2d}
 
     def get_rho2d(self, time_slice: int, profiles2d_index: int = 0) -> Union[np.ndarray, None]:
         """
