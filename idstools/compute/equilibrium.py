@@ -1157,11 +1157,7 @@ class EquilibriumCompute:
             time = self.ids.time
         else:
             # Extract time from time_slice array
-            time = (
-                np.array([ts.time for ts in self.ids.time_slice])
-                if hasattr(self.ids, "time_slice") and len(self.ids.time_slice) > 0
-                else np.array([])
-            )
+            time = np.array([ts.time for ts in self.ids.time_slice]) if len(self.ids.time_slice) > 0 else np.array([])
         nt = time.size
 
         data = {}
