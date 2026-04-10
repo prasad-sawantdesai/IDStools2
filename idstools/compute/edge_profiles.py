@@ -952,6 +952,153 @@ class EdgeProfilesCompute:
         n_neutral_edge = interpolate.griddata((r_edge, z_edge), temp, (x, y))
         return n_neutral_edge
 
+    def get_cell_polygons_and_values(self, time_slice, values):
+        """
+        Build a list of polygon vertex arrays and corresponding per-cell scalar values for
+        direct rendering with ``matplotlib.collections.PolyCollection``.
+
+        Args:
+            time_slice: time index
+            values: 1-D array of scalar values, either per-cell or per-node.
+
+        Returns:
+            tuple: ``(polygons, cell_values)`` where *polygons* is a list of ``(n_corners, 2)``
+                float arrays (R, Z columns) and *cell_values* is a 1-D float array of the
+                same length.  Returns ``(None, None)`` when the cells grid subset is unavailable.
+        """
+        r_nodes, z_nodes = self.get_rz(time_slice)
+        values = np.asarray(values, dtype=float)
+
+        cells_subset = None
+        for grid_subset in self.ids.grid_ggd[time_slice].grid_subset:
+            if grid_subset.identifier.name.lower() == "cells":
+                cells_subset = grid_subset
+                break
+
+        if cells_subset is None or len(cells_subset.element) == 0:
+            logger.warning("edge_profiles: cells grid subset not found, cannot build PolyCollection")
+            return None, None
+
+        n_cells = len(cells_subset.element)
+        per_cell_mode = len(values) == n_cells  # True → direct 1:1, False → average from nodes
+
+        polygons = []
+        cell_values = []
+        n_nodes = len(r_nodes)
+        i = 0
+        for element in cells_subset.element:
+            for obj in element.object:
+                space_index = obj.space - 1
+                dimension_index = obj.dimension - 1
+                object_index = obj.index - 1
+                nodes = (
+                    self.ids.grid_ggd[time_slice]
+                    .space[space_index]
+                    .objects_per_dimension[dimension_index]
+                    .object[object_index]
+                    .nodes
+                )
+                nodes = np.asarray(nodes, dtype=int) - 1  # convert to 0-based
+                if np.any(nodes >= n_nodes) or np.any(nodes < 0):
+                    logger.warning("edge_profiles: cell node index out of range, skipping cell")
+                    i += 1
+                    continue
+                verts = np.column_stack((r_nodes[nodes], z_nodes[nodes]))
+                polygons.append(verts)
+                if per_cell_mode:
+                    cell_values.append(float(values[i]))
+                else:
+                    cell_values.append(float(np.mean(values[nodes])))
+                i += 1
+
+        return polygons, np.array(cell_values, dtype=float)
+
+    def get_electron_density_on_nodes(self, time_slice):
+        """
+        Return raw electron density values at mesh nodes (no rectangular resampling).
+
+        Args:
+            time_slice: time index
+
+        Returns:
+            numpy array of node-centred electron density values, or ``None`` if unavailable.
+        """
+        for electrons_density in self.ids.ggd[time_slice].electrons.density:
+            if electrons_density.grid_subset_index == 1:  # nodes
+                return np.asarray(electrons_density.values)
+        logger.warning("edge_profiles: electron density values not found for nodes grid_subset")
+        return None
+
+    def get_electron_density_on_cells(self, time_slice):
+        """
+        Return electron density values.
+
+        cell-centred values (``grid_subset_index == 5``, one value per cell.  Falls
+        back to node values (``grid_subset_index == 1``) which will be averaged per cell further
+
+        Args:
+            time_slice: time index
+
+        Returns:
+            numpy array of density values, or ``None`` if unavailable.
+        """
+        for ed in self.ids.ggd[time_slice].electrons.density:
+            if ed.grid_subset_index == 5:  # cell-centred
+                return np.asarray(ed.values)
+        return self.get_electron_density_on_nodes(time_slice)
+
+    def get_ion_density_on_nodes(self, time_slice):
+        """
+        Return raw ion density values at mesh nodes (no rectangular resampling).
+
+        Args:
+            time_slice: time index
+
+        Returns:
+            numpy array of node-centred ion density values, or ``None`` if unavailable.
+        """
+        for ion_density in self.ids.ggd[time_slice].ion[0].density:
+            if ion_density.grid_subset_index == 1:  # nodes
+                return np.asarray(ion_density.values)
+        logger.warning("edge_profiles: ion density values not found for nodes grid_subset")
+        return None
+
+    def get_ion_density_on_cells(self, time_slice):
+        """
+        Return ion density values.
+        cell-centred values (``grid_subset_index == 5``), falls back to node values.
+        """
+        for id_ in self.ids.ggd[time_slice].ion[0].density:
+            if id_.grid_subset_index == 5:
+                return np.asarray(id_.values)
+        return self.get_ion_density_on_nodes(time_slice)
+
+    def get_neutral_density_on_nodes(self, time_slice):
+        """
+        Return raw neutral density values at mesh nodes (no rectangular resampling).
+
+        Args:
+            time_slice: time index
+
+        Returns:
+            numpy array of node-centred neutral density values, or ``None`` if unavailable.
+        """
+        for neutral_density in self.ids.ggd[time_slice].neutral[0].density:
+            if neutral_density.grid_subset_index == 1:  # nodes
+                return np.asarray(neutral_density.values)
+        logger.warning("edge_profiles: neutral density values not found for nodes grid_subset")
+        return None
+
+    def get_neutral_density_on_cells(self, time_slice):
+        """
+        Return neutral density values.
+        cell-centred values (``grid_subset_index == 5``), falls back to node values.
+        """
+        for nd in self.ids.ggd[time_slice].neutral[0].density:
+            if nd.grid_subset_index == 5:
+                return np.asarray(nd.values)
+        return self.get_neutral_density_on_nodes(time_slice)
+
     def get_outer_midplane_array_index(self, time_slice):
         """
         This function `get_outer_midplane_array_index` searches for a specific grid subset with an
