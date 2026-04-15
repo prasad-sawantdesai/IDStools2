@@ -257,23 +257,34 @@ class EdgeProfilesView:
             )
             return None
 
-    def view_equatorial_plane_and_diverter_density(self, ax, time_slice, logscale=False):
-        x, y = self.edge_profiles_compute.get_rectangular_grid(500)
-        ne_edge = self.edge_profiles_compute.get_electron_density(time_slice, x, y)
-        if ne_edge is not None:
-            # choose Z position for a radial profile:
-            z0 = 0.0
-            ind = np.argmin(abs(y[:, 0] - z0))
-            ax.plot(x[ind, :], ne_edge[ind, :], label="Equatorial plane")
+    def view_equatorial_plane_and_diverter_density(self, ax, time_slice, logscale=True):
+        OUTER_MIDPLANE_INDEX = 11
+        OUTER_TARGET_INDEX = 13
+        INNER_TARGET_INDEX = 14
 
-            z0 = -4.0
-            ind = np.argmin(abs(y[:, 0] - z0))
-            ax.plot(x[ind, :], ne_edge[ind, :], label="Divertor")
+        any_data = False
+
+        for subset_idx, label in (
+            (OUTER_MIDPLANE_INDEX, "Outer midplane"),
+            (OUTER_TARGET_INDEX, "Outer divertor target"),
+            (INNER_TARGET_INDEX, "Inner divertor target"),
+        ):
+            r_t, z_t, ne_t = self.edge_profiles_compute.get_rz_and_ne_on_subset(time_slice, subset_idx)
+            if r_t is None or len(r_t) == 0:
+                continue
+            # Arc-length as x-axis
+            coords = np.column_stack([r_t, z_t])
+            seg_len = np.sqrt(np.sum(np.diff(coords, axis=0) ** 2, axis=1))
+            arc = np.concatenate([[0.0], np.cumsum(seg_len)])
+            ax.plot(arc, ne_t, label=label)
+            any_data = True
+
+        if any_data:
             if logscale:
                 ax.set_yscale("log")
             ax.set_title("Electron density")
-            ax.set_xlabel("R,m")
-            # ax.set_ylim([0, 1.5e21])
+            ax.set_xlabel("Distance along profile (m)")
+            ax.set_ylabel("n$_e$ (m$^{-3}$)")
             ax.legend()
         else:
             xmin, xmax = ax.get_xlim()

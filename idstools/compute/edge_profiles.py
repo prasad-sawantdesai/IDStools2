@@ -1099,6 +1099,95 @@ class EdgeProfilesCompute:
                 return np.asarray(nd.values)
         return self.get_neutral_density_on_nodes(time_slice)
 
+    def get_rz_and_ne_on_subset(self, time_slice, subset_identifier_index):
+        """
+        Return R, Z coordinates and electron density for every element in a named GGD grid subset.
+
+        For 0-D elements (nodes) the node geometry is used directly.  For higher-dimension
+        elements (edges, faces, cells) the centroid of the element's nodes is used.
+
+        Args:
+            time_slice: time index
+            subset_identifier_index: GGD ``identifier.index`` of the target subset,
+                e.g. 11 = outer midplane, 13 = inner divertor target, 14 = outer divertor target.
+
+        Returns:
+            ``(r, z, ne)`` numpy float arrays in grid-subset element order,
+            or ``(None, None, None)`` when the subset or its density data is unavailable.
+        """
+        subset_array_index = None
+        for iset, gs in enumerate(self.ids.grid_ggd[time_slice].grid_subset):
+            if gs.identifier.index == subset_identifier_index:
+                subset_array_index = iset
+                break
+
+        if subset_array_index is None:
+            logger.warning(f"edge_profiles: grid subset with identifier.index={subset_identifier_index} not found")
+            return None, None, None
+
+        grid_subset = self.ids.grid_ggd[time_slice].grid_subset[subset_array_index]
+        if len(grid_subset.element) == 0:
+            logger.warning(f"edge_profiles: grid subset {subset_identifier_index} has no elements")
+            return None, None, None
+
+        # grid_subset_index in ggd arrays stores identifier.index (semantic index), not array position
+        ne_entry = None
+        ne_all_nodes = None
+        for dens in self.ids.ggd[time_slice].electrons.density:
+            if dens.grid_subset_index == subset_identifier_index:
+                ne_entry = dens
+                break
+            if dens.grid_subset_index == 1:  # nodes — keep as fallback
+                ne_all_nodes = np.asarray(dens.values, dtype=float)
+
+        spaces = self.ids.grid_ggd[time_slice].space
+        r_list, z_list, ne_list = [], [], []
+
+        for element in grid_subset.element:
+            for obj in element.object:
+                space_idx = obj.space - 1  # space
+                dim_idx = obj.dimension - 1  # 0=nodes, 1=edges, 2=faces, 3=cells
+                obj_idx = obj.index - 1  # convert to 0-based
+                space = spaces[space_idx]
+                n_nodes = len(space.objects_per_dimension[0].object)
+                ggd_obj = space.objects_per_dimension[dim_idx].object[obj_idx]
+                if dim_idx == 0:
+                    g = ggd_obj.geometry
+                    r_list.append(float(g[0]))
+                    z_list.append(float(g[1]))
+                    if ne_entry is None and ne_all_nodes is not None:
+                        ne_list.append(float(ne_all_nodes[obj_idx]) if obj_idx < n_nodes else np.nan)
+                else:
+                    nodes = np.asarray(ggd_obj.nodes, dtype=int) - 1  # 0-based node indices
+                    valid = nodes[(nodes >= 0) & (nodes < n_nodes)]
+                    geom = [space.objects_per_dimension[0].object[n].geometry for n in valid]
+                    r_list.append(float(np.mean([g[0] for g in geom])))
+                    z_list.append(float(np.mean([g[1] for g in geom])))
+                    if ne_entry is None and ne_all_nodes is not None:
+                        valid_ne = valid[valid < len(ne_all_nodes)]
+                        ne_list.append(float(np.mean(ne_all_nodes[valid_ne])) if len(valid_ne) else np.nan)
+
+        r = np.array(r_list, dtype=float)
+        z = np.array(z_list, dtype=float)
+
+        if ne_entry is not None:
+            ne_values = np.asarray(ne_entry.values, dtype=float)
+            if len(ne_values) != len(r):
+                logger.warning(
+                    f"edge_profiles: per-subset density count {len(ne_values)} != element count {len(r)} "
+                    f"for subset {subset_identifier_index}, falling back to node interpolation"
+                )
+                if len(ne_list) == len(r):
+                    return r, z, np.array(ne_list, dtype=float)
+                return None, None, None
+            return r, z, ne_values
+
+        if len(ne_list) == len(r):
+            return r, z, np.array(ne_list, dtype=float)
+
+        logger.warning(f"edge_profiles: electron density not found for grid subset {subset_identifier_index}")
+        return None, None, None
+
     def get_outer_midplane_array_index(self, time_slice):
         """
         This function `get_outer_midplane_array_index` searches for a specific grid subset with an
