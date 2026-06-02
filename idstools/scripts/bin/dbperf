@@ -194,7 +194,7 @@ if __name__ == "__main__":
         for entry in pulses:
             pulse = entry[0]
             run = entry[1]
-            # hack to get underlying data dictionary version used by idses
+
             _dummy_hdfde = imas.DBEntry(
                 imas.ids_defs.HDF5_BACKEND, args.database, pulse, run, args.user, data_version=args.version
             )
@@ -279,7 +279,6 @@ if __name__ == "__main__":
 
             mdsde.close()
             hdfde.close()
-            print("I am here")
             if args.verbose:
                 print("MDSPLUS database closed")
                 print("HDF5 database closed")
