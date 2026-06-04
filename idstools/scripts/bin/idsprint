@@ -13,6 +13,7 @@ except ImportError:
 
 import numpy as np
 import rich
+from rich.panel import Panel
 from rich.columns import Columns
 from rich.console import Console
 from rich.pretty import Pretty
@@ -95,6 +96,7 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
         coordinate_unit = str(coordinate.metadata.units or "")
 
     import plotext as ptx
+    from rich.align import Align
     from rich.text import Text
 
     width = max(60, min(120, shutil.get_terminal_size((100, 24)).columns - 4))
@@ -102,8 +104,7 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
     title = field_name or "field"
     console = Console()
 
-    y_name = field_name.rsplit("/", 1)[-1] or "Value"
-    y_label = f"{y_name} [{field_unit}]" if field_unit else y_name
+    y_label = f"{field_name} [{field_unit}]" if field_unit else field_name
     x_label = f"{coordinate_name} [{coordinate_unit}]" if coordinate_unit else (coordinate_name or "Index")
 
     xdata = _coordinate_1d_array(coordinate, data.size)
@@ -121,24 +122,38 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
     ptx.xlabel(x_label)
     ptx.ylabel(y_label)
     ptx.plot(xdata.tolist(), data.tolist(), color="cyan", marker="braille")
-    ptx.yticks(
-        np.linspace(data.min(), data.max(), 6).tolist(),
-        [f"{v:.2e}" for v in np.linspace(data.min(), data.max(), 6)],
+
+    ymin, ymax = data.min(), data.max()
+    ylo = min(ymin, 0)
+    yhi = max(ymax, 0)
+    ptx.ylim(ylo, yhi)
+    ptx.hline(0, color=(80, 80, 80))
+    step = max(abs(ylo), abs(yhi)) / 3
+    ytick_vals = np.array(
+        sorted(set(np.arange(0, yhi + step, step).tolist() + np.arange(0, ylo - step, -step).tolist()))
     )
+    ytick_vals = ytick_vals[(ytick_vals >= ylo) & (ytick_vals <= yhi)]
+    ptx.yticks(
+        ytick_vals.tolist(),
+        ["0" if v == 0 else f"{v:.2e}" for v in ytick_vals],
+    )
+    xpad = (xdata.max() - xdata.min()) * 0.04
+    ptx.xlim(xdata.min() - xpad, xdata.max() + xpad)
+    xtick_vals = np.linspace(xdata.min(), xdata.max(), 6)
     ptx.xticks(
-        np.linspace(xdata.min(), xdata.max(), 6).tolist(),
-        [f"{v:.2e}" for v in np.linspace(xdata.min(), xdata.max(), 6)],
+        xtick_vals.tolist(),
+        ["0" if v == 0 else f"{v:.2e}" for v in xtick_vals],
     )
     ptx.show()
 
-    stats = Text(justify="left")
-    stats.append("  min: ", style="bright_black")
+    stats = Text(justify="center")
+    stats.append("min: ", style="bright_black")
     stats.append(f"{data.min():.2e}", style="bold cyan")
     stats.append("   max: ", style="bright_black")
     stats.append(f"{data.max():.2e}", style="bold cyan")
     stats.append("   mean: ", style="bright_black")
     stats.append(f"{data.mean():.2e}", style="bold cyan")
-    console.print(stats)
+    console.print(Panel(Align.center(stats), border_style="bright_blue", padding=(0, 1)))
     return True
 
 
@@ -224,12 +239,25 @@ def view_plot(
 
 
 def print_tree(structure, hide_empty_nodes, compact, full_array, depth=None):
+    console = Console()
     if full_array:
         with np.printoptions(threshold=sys.maxsize, linewidth=1024, precision=4):
-            rich.print(_make_tree(structure, hide_empty_nodes, compact, depth=depth))
+            console.print(
+                Panel(
+                    _make_tree(structure, hide_empty_nodes, compact, depth=depth),
+                    border_style="bright_blue",
+                    padding=(0, 1),
+                )
+            )
     else:
         with np.printoptions(threshold=5, linewidth=1024, precision=4):
-            rich.print(_make_tree(structure, hide_empty_nodes, compact, depth=depth))
+            console.print(
+                Panel(
+                    _make_tree(structure, hide_empty_nodes, compact, depth=depth),
+                    border_style="bright_blue",
+                    padding=(0, 1),
+                )
+            )
 
 
 def _make_tree(structure, hide_empty_nodes, compact, *, tree=None, depth=None, current_depth=0):
