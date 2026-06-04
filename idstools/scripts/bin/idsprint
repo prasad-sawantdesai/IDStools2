@@ -10,7 +10,6 @@ try:
     import imaspy as imas
 except ImportError:
     import imas
-from itertools import tee
 
 import numpy as np
 import rich
@@ -116,7 +115,6 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
         logger.error("Terminal plot supports only arrays with finite numeric values")
         return False
     data, xdata = data[finite], xdata[finite]
-    all_data = data
 
     ptx.clf()
     ptx.canvas_color("default")
@@ -138,11 +136,11 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
 
     stats = Text(justify="left")
     stats.append("  min: ", style="bright_black")
-    stats.append(f"{all_data.min():.2e}", style="bold cyan")
+    stats.append(f"{data.min():.2e}", style="bold cyan")
     stats.append("   max: ", style="bright_black")
-    stats.append(f"{all_data.max():.2e}", style="bold cyan")
+    stats.append(f"{data.max():.2e}", style="bold cyan")
     stats.append("   mean: ", style="bright_black")
-    stats.append(f"{all_data.mean():.2e}", style="bold cyan")
+    stats.append(f"{data.mean():.2e}", style="bold cyan")
     console.print(stats)
     return True
 
@@ -336,9 +334,9 @@ def _make_tree(structure, hide_empty_nodes, compact, *, tree=None, depth=None, c
             if isinstance(child, imas.ids_structure.IDSStructure):
                 txt = f"[magenta]{child._path}[/]"
                 # check if structure is not empty
-                iterator, iterator_copy = tee(child.iter_nonempty_(accept_lazy=True))
+                _iter = child.iter_nonempty_(accept_lazy=True)
                 try:
-                    next(iterator_copy)
+                    next(_iter)
                 except StopIteration:
                     pass
                 else:
@@ -393,7 +391,7 @@ def _make_dict_tree(structure, hide_empty_nodes, compact, *, tree=None):
                 for counter, ids_structure in enumerate(child):
                     ntree = {}
                     nlist.append(ntree)
-                    nlist.append(_make_dict_tree(ids_structure, hide_empty_nodes, compact, tree=ntree))
+                    _make_dict_tree(ids_structure, hide_empty_nodes, compact, tree=ntree)
     return tree
 
 
