@@ -56,7 +56,6 @@ def _shape_label(value):
     return f" | shape={shape} | dtype={dtype}"
 
 
-
 def _coordinate_1d_array(coordinate, size):
     coordinate = _node_value(coordinate)
     if coordinate is None or isinstance(coordinate, int):
@@ -68,8 +67,6 @@ def _coordinate_1d_array(coordinate, size):
     if coordinate.ndim != 1 or coordinate.size != size or not np.issubdtype(coordinate.dtype, np.number):
         return np.arange(size, dtype=float)
     return coordinate.astype(float, copy=False)
-
-
 
 
 def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index", field_unit="", coordinate_unit=""):
@@ -733,5 +730,5 @@ if __name__ == "__main__":
                     field_unit=node_unit,
                     coordinate_unit=coordinate_unit,
                 )
-            
+
     connection.close()
