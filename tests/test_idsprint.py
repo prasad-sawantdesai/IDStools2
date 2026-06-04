@@ -72,6 +72,15 @@ class TestIDSPrintScript:
         assert plot_file.stat().st_size > 1000
 
     @require_ids("summary")
+    def test_idsprint_terminal_plot_time_field(self, test_file_path):
+        result = self.run_idsprint(["--uri", f"{test_file_path}#summary/time"])
+
+        assert result.returncode == 0
+        assert "Terminal plot:" in result.stdout
+        assert "shape=(" in result.stdout
+        assert "(Index)" in result.stdout
+
+    @require_ids("summary")
     def test_idsprint_compact_output(self, test_file_path):
         result = self.run_idsprint(["--uri", f"{test_file_path}#summary", "-c"])
 

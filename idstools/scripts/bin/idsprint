@@ -3,6 +3,7 @@
 import argparse
 import logging
 import os
+import shutil
 import sys
 
 try:
@@ -33,6 +34,117 @@ from idstools.utils.idslogger import setup_logger
 from idstools.view.common import PlotCanvas
 
 logger = setup_logger("module", stdout_level=logging.INFO)
+
+
+def _node_value(node):
+    if isinstance(node, imas.ids_primitive.IDSPrimitive):
+        if not node.has_value:
+            return None
+        return node.value
+    return node
+
+
+def _shape_label(value):
+    value = _node_value(value)
+    if value is None:
+        return ""
+    shape = getattr(value, "shape", None)
+    dtype = getattr(value, "dtype", None)
+    if shape is None:
+        return ""
+    if dtype is None:
+        return f" | shape={shape}"
+    return f" | shape={shape} | dtype={dtype}"
+
+
+
+def _coordinate_1d_array(coordinate, size):
+    coordinate = _node_value(coordinate)
+    if coordinate is None or isinstance(coordinate, int):
+        return np.arange(size, dtype=float)
+    try:
+        coordinate = np.asarray(coordinate)
+    except Exception:
+        return np.arange(size, dtype=float)
+    if coordinate.ndim != 1 or coordinate.size != size or not np.issubdtype(coordinate.dtype, np.number):
+        return np.arange(size, dtype=float)
+    return coordinate.astype(float, copy=False)
+
+
+
+
+def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index", field_unit="", coordinate_unit=""):
+    raw = _node_value(field)
+    try:
+        data = np.asarray(raw).astype(float)
+    except Exception:
+        data = None
+    if data is None or data.size == 0 or not np.issubdtype(data.dtype, np.number) or data.ndim != 1:
+        logger.error("Terminal plot supports only numeric 1D arrays")
+        return False
+
+    # Extract units and coordinate from IDS metadata if not provided
+    if isinstance(field, imas.ids_primitive.IDSPrimitive):
+        if not field_unit:
+            field_unit = str(field.metadata.units or "")
+    if coordinate is None and isinstance(field, imas.ids_primitive.IDSNumericArray):
+        for candidate in field.coordinates:
+            if isinstance(candidate, imas.ids_primitive.IDSPrimitive) and candidate.has_value:
+                coordinate = candidate
+                coordinate_name = candidate.metadata.name or candidate.metadata.path or coordinate_name
+                if not coordinate_unit:
+                    coordinate_unit = str(candidate.metadata.units or "")
+                break
+    if isinstance(coordinate, imas.ids_primitive.IDSPrimitive) and not coordinate_unit:
+        coordinate_unit = str(coordinate.metadata.units or "")
+
+    import plotext as ptx
+    from rich.text import Text
+
+    width = max(60, min(120, shutil.get_terminal_size((100, 24)).columns - 4))
+    height = 20
+    title = field_name or "field"
+    console = Console()
+
+    y_name = field_name.rsplit("/", 1)[-1] or "Value"
+    y_label = f"{y_name} [{field_unit}]" if field_unit else y_name
+    x_label = f"{coordinate_name} [{coordinate_unit}]" if coordinate_unit else (coordinate_name or "Index")
+
+    xdata = _coordinate_1d_array(coordinate, data.size)
+    finite = np.isfinite(data) & np.isfinite(xdata)
+    if not np.any(finite):
+        logger.error("Terminal plot supports only arrays with finite numeric values")
+        return False
+    data, xdata = data[finite], xdata[finite]
+    all_data = data
+
+    ptx.clf()
+    ptx.canvas_color("default")
+    ptx.axes_color("default")
+    ptx.ticks_color("white")
+    ptx.plot_size(width, height)
+    ptx.xlabel(x_label)
+    ptx.ylabel(y_label)
+    ptx.plot(xdata.tolist(), data.tolist(), color="cyan", marker="braille")
+    ptx.yticks(
+        np.linspace(data.min(), data.max(), 6).tolist(),
+        [f"{v:.2e}" for v in np.linspace(data.min(), data.max(), 6)],
+    )
+    ptx.xticks(
+        np.linspace(xdata.min(), xdata.max(), 6).tolist(),
+        [f"{v:.2e}" for v in np.linspace(xdata.min(), xdata.max(), 6)],
+    )
+    ptx.show()
+
+    stats = Text(justify="left")
+    stats.append("  min: ", style="bright_black")
+    stats.append(f"{all_data.min():.2e}", style="bold cyan")
+    stats.append("   max: ", style="bright_black")
+    stats.append(f"{all_data.max():.2e}", style="bold cyan")
+    stats.append("   mean: ", style="bright_black")
+    stats.append(f"{all_data.mean():.2e}", style="bold cyan")
+    console.print(stats)
+    return True
 
 
 def view_plot(
@@ -173,7 +285,19 @@ def _make_tree(structure, hide_empty_nodes, compact, *, tree=None, depth=None, c
                 group = Columns([txt])
             tree.add(group)
             return tree
-        elif isinstance(structure, np.float64) or isinstance(structure, imas.ids_primitive.IDSPrimitive):
+        elif isinstance(structure, imas.ids_primitive.IDSPrimitive):
+            tree = Tree(f"[magenta]{type(structure)}")
+            if not structure.has_value:
+                tree.add(f"[grey62]{structure.metadata.name}[/]")
+            else:
+                value = Pretty(structure.value)
+                txt = f"[bright_yellow]{structure.metadata.name}{_shape_label(structure)}[/]:"
+                group = Columns([txt, value])
+                if compact:
+                    group = Columns([f"[bright_yellow]{structure.metadata.name}{_shape_label(structure)}[/]"])
+                tree.add(group)
+            return tree
+        elif isinstance(structure, np.float64):
             return structure
         else:
             tree = Tree(f"[magenta]{structure.metadata.name}")
@@ -201,11 +325,11 @@ def _make_tree(structure, hide_empty_nodes, compact, *, tree=None, depth=None, c
                 txt = f"[grey62]{child.metadata.name}[/]"
             else:
                 value = Pretty(child.value)
-                txt = f"[bright_yellow]{child.metadata.name}[/]:"
+                txt = f"[bright_yellow]{child.metadata.name}{_shape_label(child)}[/]:"
 
             group = Columns([txt, value])
             if compact:
-                txt = f"[bright_yellow]{child.metadata.name}[/]"
+                txt = f"[bright_yellow]{child.metadata.name}{_shape_label(child)}[/]"
                 group = Columns([txt])
             tree.add(group)
         else:
@@ -332,7 +456,7 @@ if __name__ == "__main__":
         "-p",
         "--plot",
         action="store_true",
-        help="plot 1d arrays from leaf nodes",
+        help="Plot arrays from leaf nodes with Matplotlib",
     )
     parser.add_argument(
         "--coordinate",
@@ -597,4 +721,19 @@ if __name__ == "__main__":
             print_tree(
                 node, hide_empty_nodes=not args.show_empty, compact=args.compact, full_array=args.full, depth=args.depth
             )
+            arr = _node_value(node)
+            try:
+                arr = np.asarray(arr)
+            except Exception:
+                arr = None
+            if arr is not None and arr.ndim == 1 and arr.size > 0 and np.issubdtype(arr.dtype, np.number):
+                print_terminal_plot(
+                    node,
+                    coordinate,
+                    field_name=f"{ids_name}/{original_ids_path}",
+                    coordinate_name=coordinate_name or "Index",
+                    field_unit=node_unit,
+                    coordinate_unit=coordinate_unit,
+                )
+            
     connection.close()
