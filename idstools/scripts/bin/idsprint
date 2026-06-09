@@ -74,10 +74,11 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
     raw = _node_value(field)
     try:
         data = np.asarray(raw).astype(float)
-    except Exception:
+    except (ValueError, TypeError):
         data = None
-    if data is None or data.size == 0 or not np.issubdtype(data.dtype, np.number) or data.ndim != 1:
-        logger.warning("Terminal plot supports only numeric 1D arrays")
+
+    if data is None or data.size == 0 or data.ndim != 1:
+        logger.warning("Terminal plot supports only 1D numeric arrays")
         return False
 
     # Extract units and coordinate from IDS metadata if not provided
@@ -113,7 +114,7 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
 
     ptx.xlabel(x_label)
     ptx.ylabel(y_label)
-    ptx.plot(xdata.tolist(), data.tolist(), color="red", marker="braille")
+    ptx.plot(xdata.tolist(), data.tolist(), color="cyan", marker="braille")
     ptx.show()
 
     stats = Text(justify="center")
