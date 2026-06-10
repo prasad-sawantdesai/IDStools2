@@ -185,9 +185,7 @@ It can also save generated figures to a specified directory or the default locat
 
    $ idsprint --uri "imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3#core_profiles/profiles_1d(:)/electrons/temperature" -p
 
-   # Terminal plots use the terminal foreground/background by default.
-   # Colors can be overridden with plotext color names or 0-255 color codes.
-   $ idsprint --uri "imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3#summary/time" --terminal-foreground-color cyan --terminal-background-color default
+   $ idsprint --uri "imas:mdsplus?user=public;pulse=134174;run=117;database=ITER;version=3#summary/time"
 
 .. image:: _static/images/idsprint_1.png
    :alt: image not found

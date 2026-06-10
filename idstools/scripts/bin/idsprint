@@ -44,19 +44,6 @@ def _node_value(node):
     return node
 
 
-def _shape_label(value):
-    value = _node_value(value)
-    if value is None:
-        return ""
-    shape = getattr(value, "shape", None)
-    dtype = getattr(value, "dtype", None)
-    if shape is None:
-        return ""
-    if dtype is None:
-        return f" | shape={shape}"
-    return f" | shape={shape} | dtype={dtype}"
-
-
 def _coordinate_1d_array(coordinate, size):
     coordinate = _node_value(coordinate)
     if coordinate is None or isinstance(coordinate, int):
@@ -295,10 +282,10 @@ def _make_tree(structure, hide_empty_nodes, compact, *, tree=None, depth=None, c
                 tree.add(f"[grey62]{structure.metadata.name}[/]")
             else:
                 value = Pretty(structure.value)
-                txt = f"[bright_yellow]{structure.metadata.name}{_shape_label(structure)}[/]:"
-                group = Columns([txt, value])
-                if compact:
-                    group = Columns([f"[bright_yellow]{structure.metadata.name}{_shape_label(structure)}[/]"])
+            txt = f"[bright_yellow]{structure.metadata.name}[/]:"
+            group = Columns([txt, value])
+            if compact:
+                group = Columns([f"[bright_yellow]{structure.metadata.name}[/]"])
                 tree.add(group)
             return tree
         elif isinstance(structure, np.float64):
@@ -329,11 +316,11 @@ def _make_tree(structure, hide_empty_nodes, compact, *, tree=None, depth=None, c
                 txt = f"[grey62]{child.metadata.name}[/]"
             else:
                 value = Pretty(child.value)
-                txt = f"[bright_yellow]{child.metadata.name}{_shape_label(child)}[/]:"
+                txt = f"[bright_yellow]{child.metadata.name}[/]:"
 
             group = Columns([txt, value])
             if compact:
-                txt = f"[bright_yellow]{child.metadata.name}{_shape_label(child)}[/]"
+                txt = f"[bright_yellow]{child.metadata.name}[/]"
                 group = Columns([txt])
             tree.add(group)
         else:
