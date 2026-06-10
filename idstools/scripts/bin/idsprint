@@ -70,7 +70,14 @@ def _coordinate_1d_array(coordinate, size):
     return coordinate.astype(float, copy=False)
 
 
-def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index", field_unit="", coordinate_unit=""):
+def print_terminal_plot(
+    field,
+    coordinate,
+    field_name="",
+    coordinate_name="Index",
+    field_unit="",
+    coordinate_unit="",
+):
     raw = _node_value(field)
     try:
         data = np.asarray(raw).astype(float)
@@ -112,6 +119,9 @@ def print_terminal_plot(field, coordinate, field_name="", coordinate_name="Index
         return False
     data, xdata = data[finite], xdata[finite]
 
+    ptx.canvas_color("default")
+    ptx.axes_color("default")
+    ptx.ticks_color("default")
     ptx.xlabel(x_label)
     ptx.ylabel(y_label)
     ptx.plot(xdata.tolist(), data.tolist(), color="cyan", marker="braille")
