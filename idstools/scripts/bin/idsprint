@@ -148,7 +148,9 @@ def print_terminal_plot(
     stats.append(f"{data.max():.2e}", style="bold cyan")
     stats.append("   mean: ", style="bright_black")
     stats.append(f"{data.mean():.2e}", style="bold cyan")
-    console.print(Align.center(Panel(Align.center(stats), border_style="bright_blue", padding=(0, 1), width=plot_width)))
+    console.print(
+        Align.center(Panel(Align.center(stats), border_style="bright_blue", padding=(0, 1), width=plot_width))
+    )
 
     plot = Text.from_ansi(ptx.build())
     console.print(Align.center(plot))
