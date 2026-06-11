@@ -35,6 +35,11 @@ from idstools.view.common import PlotCanvas
 
 logger = setup_logger("module", stdout_level=logging.INFO)
 
+TERMINAL_PLOT_WIDTH = 70
+TERMINAL_PLOT_HEIGHT = 20
+TERMINAL_PLOT_TICKS = 5
+TERMINAL_PLOT_SCIENTIFIC_THRESHOLD = 1e4
+
 
 def _node_value(node):
     if isinstance(node, imas.ids_primitive.IDSPrimitive):
@@ -55,6 +60,22 @@ def _coordinate_1d_array(coordinate, size):
     if coordinate.ndim != 1 or coordinate.size != size or not np.issubdtype(coordinate.dtype, np.number):
         return np.arange(size, dtype=float)
     return coordinate.astype(float, copy=False)
+
+
+def _scientific_ticks(values, count=TERMINAL_PLOT_TICKS):
+    values = np.asarray(values, dtype=float)
+    values = values[np.isfinite(values)]
+    if values.size == 0:
+        return [], []
+    lower = float(values.min())
+    upper = float(values.max())
+    if lower == upper:
+        ticks = [lower]
+    else:
+        ticks = np.linspace(lower, upper, min(count, values.size)).tolist()
+    use_scientific = np.max(np.abs(values)) >= TERMINAL_PLOT_SCIENTIFIC_THRESHOLD
+    labels = [f"{tick:.2e}" if use_scientific else f"{tick:.4g}" for tick in ticks]
+    return ticks, labels
 
 
 def print_terminal_plot(
@@ -106,13 +127,19 @@ def print_terminal_plot(
         return False
     data, xdata = data[finite], xdata[finite]
 
+    ptx.clear_figure()
     ptx.canvas_color("default")
     ptx.axes_color("default")
     ptx.ticks_color("default")
-    ptx.xlabel(x_label)
-    ptx.ylabel(y_label)
+    terminal_width, terminal_height = ptx.terminal_size()
+    plot_width = min(TERMINAL_PLOT_WIDTH, max(40, terminal_width - 4))
+    plot_height = min(TERMINAL_PLOT_HEIGHT, max(12, terminal_height - 8))
+    ptx.plot_size(plot_width, plot_height)
+    xticks, xlabels = _scientific_ticks(xdata)
+    yticks, ylabels = _scientific_ticks(data)
+    ptx.xticks(xticks, xlabels)
+    ptx.yticks(yticks, ylabels)
     ptx.plot(xdata.tolist(), data.tolist(), color="cyan", marker="braille")
-    ptx.show()
 
     stats = Text(justify="center")
     stats.append("min: ", style="bright_black")
@@ -121,7 +148,18 @@ def print_terminal_plot(
     stats.append(f"{data.max():.2e}", style="bold cyan")
     stats.append("   mean: ", style="bright_black")
     stats.append(f"{data.mean():.2e}", style="bold cyan")
-    console.print(Panel(Align.center(stats), border_style="bright_blue", padding=(0, 1)))
+    console.print(Align.center(Panel(Align.center(stats), border_style="bright_blue", padding=(0, 1), width=plot_width)))
+
+    plot = Text.from_ansi(ptx.build())
+    console.print(Align.center(plot))
+
+    axis_labels = Table.grid(padding=(0, 1))
+    axis_labels.add_column(justify="right", style="bright_black", no_wrap=True)
+    axis_labels.add_column(style="cyan")
+    axis_labels.add_row("x:", x_label)
+    if y_label:
+        axis_labels.add_row("y:", y_label)
+    console.print(Align.center(Panel(axis_labels, border_style="bright_black", padding=(0, 1), width=plot_width)))
     return True
 
 
