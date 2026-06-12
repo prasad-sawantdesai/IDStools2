@@ -35,8 +35,8 @@ from idstools.view.common import PlotCanvas
 
 logger = setup_logger("module", stdout_level=logging.INFO)
 
-TERMINAL_PLOT_WIDTH = 70
-TERMINAL_PLOT_HEIGHT = 20
+TERMINAL_PLOT_WIDTH = 120
+TERMINAL_PLOT_HEIGHT = 30
 TERMINAL_PLOT_TICKS = 5
 TERMINAL_PLOT_SCIENTIFIC_THRESHOLD = 1e4
 
