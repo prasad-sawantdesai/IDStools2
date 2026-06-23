@@ -29,7 +29,7 @@ _requested_backend = _backend_from_cli_rc(sys.argv)
 if _requested_backend:
     os.environ["MPLBACKEND"] = _requested_backend
 
-import matplotlib
+import matplotlib  # noqa: E402 - backend env must be set before importing matplotlib
 
 
 def _is_jupyter() -> bool:
