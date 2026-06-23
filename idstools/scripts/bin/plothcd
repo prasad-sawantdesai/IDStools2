@@ -14,6 +14,7 @@ from idstools.compute.common import get_nearest_time
 from idstools.compute.waves import WavesCompute
 from idstools.database import DBMaster
 from idstools.utils.clihelper import (
+    show_plot,
     get_database_path,
     get_file_name,
     rcparam_parser,
@@ -28,6 +29,8 @@ logger = setup_logger("module", stdout_level=logging.INFO)
 
 def _show_waves_plots(connargs, args, hold=False, dd_update=False, rc=""):
     connargs.no_provenance = args.get("no_provenance", False)
+    connargs.save = args["save"]
+    connargs.directory = args["directory"]
     conn = DBMaster.get_connection(connargs)
     if conn is None:
         logger.critical(f"data entry not found : {connargs}")
@@ -105,11 +108,7 @@ def _show_waves_plots(connargs, args, hold=False, dd_update=False, rc=""):
         )
         canvas.get_current_fig_manager().set_window_title(os.path.basename(__file__))
         canvas.set_sup_title(get_database_path(connargs, time_value=time_value))
-        if args["save"]:
-            fname = get_file_name(connargs, "hcd_waves_plot", time_value)
-            canvas.save(fname)
-        else:
-            canvas.show()
+        show_plot(canvas, connargs, "hcd_waves_plot", time_value)
     conn.close()
 
 
@@ -143,6 +142,8 @@ def show_waves_plots(args, hold=False, dd_update=False, rc=""):
 
 def _show_distribution_plots(connargs, args, hold=False, dd_update=False, rc=""):
     connargs.no_provenance = args.get("no_provenance", False)
+    connargs.save = args["save"]
+    connargs.directory = args["directory"]
     conn = DBMaster.get_connection(connargs)
     if conn is None:
         logger.critical(f"data entry not found : {connargs}")
@@ -191,11 +192,7 @@ def _show_distribution_plots(connargs, args, hold=False, dd_update=False, rc="")
         )
         canvas.get_current_fig_manager().set_window_title(os.path.basename(__file__))
         canvas.set_sup_title(get_database_path(connargs, time_value=time_value))
-        if args["save"]:
-            fname = get_file_name(connargs, os.path.basename(__file__) + "_Distributions_profile_time", time_value)
-            canvas.save(fname)
-        else:
-            canvas.show()
+        show_plot(canvas, connargs, os.path.basename(__file__) + "_Distributions_profile_time", time_value)
     conn.close()
 
 
