@@ -443,22 +443,26 @@ if __name__ == "__main__":
         ec_args["force_psi"] = None
         ec_args["hide_legend"] = False
         ec_args["save"] = args["save"]
+        ec_args["directory"] = args["directory"]
         show_waves_plots(ec_args, hold=holder["ech_hold"], dd_update=args["dd_update"], rc=args["rc"])
 
     # NUCLEAR REACTIONS
     if hcd_sources["fus"]["run"]:
         fus_args = hcd_sources["fus"]
         fus_args["save"] = args["save"]
+        fus_args["directory"] = args["directory"]
         show_distribution_plots(fus_args, hold=holder["icrh_hold"], dd_update=args["dd_update"], rc=args["rc"])
 
     # NBI
     if hcd_sources["nbi"]["run"]:
         nbi_args = hcd_sources["nbi"]
         nbi_args["save"] = args["save"]
+        nbi_args["directory"] = args["directory"]
         show_distribution_plots(nbi_args, hold=holder["nbi_hold"], dd_update=args["dd_update"], rc=args["rc"])
 
     # ICRH
     if hcd_sources["icrh"]["run"]:
         icrh_args = hcd_sources["icrh"]
         icrh_args["save"] = args["save"]
+        icrh_args["directory"] = args["directory"]
         show_distribution_plots(icrh_args, hold=holder["fus_hold"], dd_update=args["dd_update"], rc=args["rc"])
