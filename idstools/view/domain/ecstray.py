@@ -111,7 +111,7 @@ class EcStrayView:
         if rho2d is not None and len(rho2d) > 0:
             contour_lines_rho = ax.contour(r2d, z2d, rho2d.T, 50, cmap="YlOrBr")
             cbar_rho = plt.colorbar(contour_lines_rho, ax=ax, orientation="horizontal", pad=0.08, fraction=0.03)
-            cbar_rho.set_label(r"$\rho$ [Wb]")
+            cbar_rho.set_label(r"$\sqrt{\Phi/\Phi_{\max}}$ [1]")
         # ax_polview.set_xlim(r2d.min(),r2d.max())
         ax.set_title("Poloidal view (R,Z)")
         ax.set_xlabel("R [m]", labelpad=lpad)

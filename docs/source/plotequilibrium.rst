@@ -3,8 +3,16 @@
 #################
 
 *plotequilibrium* script shows plasma equilibrium. Optionally it also
-shows pf coils position and toroidal flux.
+shows PF coil positions and a toroidal-flux-derived contour overlay.
 `refer data dictionary <https://imas-data-dictionary.readthedocs.io/en/latest/>`_.
+
+``--rho`` overlays contours calculated from
+``equilibrium/time_slice/profiles_2d/phi`` as
+
+.. math::
+
+   \sqrt{\frac{\Phi(R,Z)}{\max_{R,Z}\Phi(R,Z)}}
+
 
 ************************
  Syntax plotequilibrium
