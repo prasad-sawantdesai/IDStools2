@@ -248,7 +248,7 @@ if __name__ == "__main__":
                 borderpad=0,
             )
             cbar_rho = canvas.fig.colorbar(c_rho, cax=cax_rho)
-            cbar_rho.set_label(r"$\sqrt{\Phi/\Phi_{\max}}$ [1]", fontsize=7, rotation=90, labelpad=4)
+            cbar_rho.set_label(r"$\Phi$ [Wb]", fontsize=7, rotation=90, labelpad=4)
             cbar_rho.ax.yaxis.set_label_position("left")
             cbar_rho.ax.tick_params(labelsize=7)
 
