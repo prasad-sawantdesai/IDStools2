@@ -49,10 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--time", help="Time (default=middle)", type=float, default=-99.0)
     parser.add_argument(
         "--phi",
-        help=(
-            "Overlay contours of toroidal magnetic flux Φ(R,Z) [Wb] "
-            "from equilibrium profiles_2d/phi"
-        ),
+        help=("Overlay contours of toroidal magnetic flux Φ(R,Z) [Wb] " "from equilibrium profiles_2d/phi"),
         action="store_true",
     )
     parser.add_argument(
