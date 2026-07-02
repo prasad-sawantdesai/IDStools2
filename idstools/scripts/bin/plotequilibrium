@@ -48,9 +48,10 @@ if __name__ == "__main__":
     )
     parser.add_argument("-t", "--time", help="Time (default=middle)", type=float, default=-99.0)
     parser.add_argument(
-        "--rho",
+        "--phi",
         help=(
-            "Overlay contours of sqrt(phi / max(phi)), using toroidal magnetic " "flux from equilibrium profiles_2d/phi"
+            "Overlay contours of toroidal magnetic flux Φ(R,Z) [Wb] "
+            "from equilibrium profiles_2d/phi"
         ),
         action="store_true",
     )
@@ -215,7 +216,7 @@ if __name__ == "__main__":
             plot_magnetic_axis=False,
             plot_current_centre=False,
             plot_boundary_data=False,
-            plot_rho=args.rho,
+            plot_rho=args.phi,
             plot_annotations=False,
         )
         legend = ax1.get_legend()
