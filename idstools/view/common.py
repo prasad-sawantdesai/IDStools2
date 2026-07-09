@@ -48,26 +48,6 @@ def _is_jupyter() -> bool:
         return False
 
 
-if not os.environ.get("MPLBACKEND"):
-    if _is_jupyter():
-        if "matplotlib.pyplot" not in sys.modules:
-            try:
-                import ipympl  # noqa: F401 - imported to check availability
-
-                matplotlib.use("widget")
-            except ImportError:
-                matplotlib.use("agg")
-    elif sys.platform.startswith("win") or "DISPLAY" in os.environ:
-
-        try:
-            import tkinter  # noqa: F401 - imported to check availability
-
-            matplotlib.use("TkAgg")
-        except (ImportError, ModuleNotFoundError):
-            matplotlib.use("agg")
-    else:
-        matplotlib.use("agg")
-
 import matplotlib.pyplot as plt  # noqa: E402
 
 logger = logging.getLogger("module")
@@ -266,8 +246,8 @@ class PlotCanvas:
             None
 
         Notes:
-            Uses the TkAgg backend for window resizing when available.
-            Other backends (agg, Qt) may not support window maximization.
+            Window maximization depends on the backend selected by Matplotlib.
+            Some backends may not support it.
 
         Examples:
             >>> canvas = PlotCanvas()
@@ -288,7 +268,7 @@ class PlotCanvas:
             return
         wm = self.get_current_fig_manager()
         try:
-            # Try to maximize the window (only works with TkAgg backend)
+            # Try to maximize the window when the active backend exposes one.
             window = wm.window
             screen_y = window.winfo_screenheight()
             screen_x = window.winfo_screenwidth()
