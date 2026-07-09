@@ -262,7 +262,7 @@ class PlotCanvas:
 
                 display(self.fig)
                 if backend not in ("widget", "ipympl", "module://ipympl.backend_nbagg"):
-                    plt.close("all")
+                    plt.close(self.fig)
             except ImportError:
                 pass
             return

@@ -223,10 +223,23 @@ def _is_interactive_backend(canvas):
     return getattr(canvas.fig.canvas, "required_interactive_framework", None) is not None
 
 
+def _is_jupyter():
+    """Return True if running inside a Jupyter notebook/lab/Colab kernel."""
+    try:
+        from IPython import get_ipython
+
+        shell = get_ipython()
+        if shell is None:
+            return False
+        return shell.__class__.__name__ in ("ZMQInteractiveShell", "Shell")
+    except ImportError:
+        return False
+
+
 def show_plot(canvas, imasargs, title="", time_value=None, fname=None, show_kwargs=None):
     """Save non-interactive canvases automatically, otherwise show the plot."""
     noninteractive = not _is_interactive_backend(canvas)
-    if not imasargs.save and not noninteractive:
+    if not imasargs.save and (_is_jupyter() or not noninteractive):
         canvas.show(**(show_kwargs or {}))
         return
 
