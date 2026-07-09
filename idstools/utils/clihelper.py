@@ -2,6 +2,8 @@ import argparse
 import os
 import re
 
+import matplotlib
+
 try:
     import imaspy as imas
 except ImportError:
@@ -213,9 +215,17 @@ def get_file_name(imasargs, title="", time_value=None):
     return _file_name
 
 
+def _is_interactive_backend(canvas):
+    """Return True for GUI and notebook widget backends."""
+    backend = matplotlib.get_backend().lower()
+    if backend in ("widget", "ipympl", "module://ipympl.backend_nbagg"):
+        return True
+    return getattr(canvas.fig.canvas, "required_interactive_framework", None) is not None
+
+
 def show_plot(canvas, imasargs, title="", time_value=None, fname=None, show_kwargs=None):
     """Save non-interactive canvases automatically, otherwise show the plot."""
-    noninteractive = getattr(canvas.fig.canvas, "required_interactive_framework", None) is None
+    noninteractive = not _is_interactive_backend(canvas)
     if not imasargs.save and not noninteractive:
         canvas.show(**(show_kwargs or {}))
         return
