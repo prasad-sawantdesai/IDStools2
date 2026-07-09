@@ -261,7 +261,7 @@ class PlotCanvas:
                 from IPython.display import display
 
                 display(self.fig)
-                if backend != "module://matplotlib_ipympl.backend_nbagg":
+                if backend != "module://ipympl.backend_nbagg":
                     plt.close("all")
             except ImportError:
                 pass
