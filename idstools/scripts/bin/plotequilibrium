@@ -12,6 +12,8 @@ try:
     import imaspy as imas
 except ImportError:
     import imas
+# PlotCanvas configures a --rc backend before mpl_toolkits imports Matplotlib.
+from idstools.view.common import PlotCanvas
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from rich_argparse import RichHelpFormatter
 
@@ -27,7 +29,6 @@ from idstools.utils.clihelper import (
     rcparam_parser,
 )
 from idstools.utils.idslogger import setup_logger
-from idstools.view.common import PlotCanvas
 from idstools.view.domain.mdplot import plot_machine_description
 from idstools.view.equilibrium import EquilibriumView
 
@@ -86,7 +87,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--save",
-        help="Save figure at default location",
+        help=(
+            "Save the plot to a file instead of opening a window. "
+            "If no plot window is available, it is saved automatically."
+        ),
         action="store_true",
     )
     parser.add_argument(

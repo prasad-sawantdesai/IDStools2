@@ -127,7 +127,10 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--hide_legend", help="remove the legend from graphs", action="store_true")
     parser.add_argument(
         "--save",
-        help="Save figure at default location",
+        help=(
+            "Save the plot to a file instead of opening a window. "
+            "If no plot window is available, it is saved automatically."
+        ),
         action="store_true",
     )
     parser.add_argument(

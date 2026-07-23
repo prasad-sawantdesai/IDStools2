@@ -1,52 +1,15 @@
-import ast
 import logging
 import os
 import sys
 
+from idstools.utils.matplotlib_backend import (
+    _configure_backend_from_cli_rc,
+    _is_jupyter,
+)
 
-def _backend_from_cli_rc(argv):
-    """Return a backend requested by a --rc backend=... command-line option."""
-    for index, argument in enumerate(argv):
-        if argument == "--rc" and index + 1 < len(argv):
-            rc_string = argv[index + 1]
-        elif argument.startswith("--rc="):
-            rc_string = argument.split("=", 1)[1]
-        else:
-            continue
-        for item in rc_string.split(";"):
-            key, separator, value = item.partition("=")
-            if separator and key.strip() == "backend":
-                value = value.strip()
-                try:
-                    value = ast.literal_eval(value)
-                except (SyntaxError, ValueError):
-                    pass
-                return str(value)
-    return None
-
-
-_requested_backend = _backend_from_cli_rc(sys.argv)
-if _requested_backend:
-    os.environ["MPLBACKEND"] = _requested_backend
+_configure_backend_from_cli_rc()
 
 import matplotlib  # noqa: E402 - backend env must be set before importing matplotlib
-
-
-def _is_jupyter() -> bool:
-    """Return True if running inside a Jupyter notebook/lab/Colab kernel."""
-    try:
-        from IPython import get_ipython
-
-        shell = get_ipython()
-        if shell is None:
-            return False
-        shell_class = shell.__class__.__name__
-        # ZMQInteractiveShell: Jupyter Notebook/Lab
-        # Shell: Google Colab
-        return shell_class in ("ZMQInteractiveShell", "Shell")
-    except ImportError:
-        return False
-
 
 import matplotlib.pyplot as plt  # noqa: E402
 

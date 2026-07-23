@@ -1,8 +1,17 @@
 import argparse
+import logging
 import os
 import re
+from datetime import datetime
 
-import matplotlib
+from idstools.utils.matplotlib_backend import (
+    _configure_backend_from_cli_rc,
+    _is_jupyter,
+)
+
+_configure_backend_from_cli_rc()
+
+logger = logging.getLogger("module")
 
 try:
     import imaspy as imas
@@ -198,59 +207,45 @@ def get_title(imasargs, title="", time_value=None):
 
 
 def get_file_name(imasargs, title="", time_value=None):
-    _file_name = ""
-    if title:
-        _file_name += f"{title}_"
-    if "uri" in imasargs.__dict__ and imasargs.uri:
-        param = get_details_from_uri(imasargs.uri)
-        if param["pathPresent"]:
-            _file_name += f"PATH_{param['path'].replace('/', '_')}_"
-        else:
-            _file_name += f"PULSE_{param['pulse']}_RUN_{param['run']}_"
-    else:
-        _file_name += f"PULSE_{imasargs.pulse}_RUN_{imasargs.run}_"
-    if time_value:
-        _file_name += f"TIME_{time_value:.3f}"
-    _file_name += ".png"
-    return _file_name
+    tool_name = title or "plot"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"{tool_name}_{timestamp}.png"
 
 
 def _is_interactive_backend(canvas):
     """Return True for GUI and notebook widget backends."""
+    import matplotlib
+
     backend = matplotlib.get_backend().lower()
     if backend in ("widget", "ipympl", "module://ipympl.backend_nbagg"):
         return True
     return getattr(canvas.fig.canvas, "required_interactive_framework", None) is not None
 
 
-def _is_jupyter():
-    """Return True if running inside a Jupyter notebook/lab/Colab kernel."""
-    try:
-        from IPython import get_ipython
-
-        shell = get_ipython()
-        if shell is None:
-            return False
-        return shell.__class__.__name__ in ("ZMQInteractiveShell", "Shell")
-    except ImportError:
-        return False
-
-
 def show_plot(canvas, imasargs, title="", time_value=None, fname=None, show_kwargs=None):
-    """Save non-interactive canvases automatically, otherwise show the plot."""
+    """Display interactive plots and save non-interactive plots automatically."""
     noninteractive = not _is_interactive_backend(canvas)
     if not imasargs.save and (_is_jupyter() or not noninteractive):
         canvas.show(**(show_kwargs or {}))
         return
 
+    automatic_save = noninteractive and not imasargs.save
     if fname is None:
         fname = get_file_name(imasargs, title, time_value)
-    if noninteractive and not imasargs.save:
+    if automatic_save:
         extension = canvas.fig.canvas.get_default_filetype()
         fname = f"{os.path.splitext(fname)[0]}.{extension}"
     if imasargs.directory:
         os.makedirs(imasargs.directory, exist_ok=True)
         fname = os.path.join(imasargs.directory, fname)
+    if automatic_save:
+        import matplotlib
+
+        logger.info(
+            "Non-interactive Matplotlib backend '%s' detected; saving figure to %s",
+            matplotlib.get_backend(),
+            fname,
+        )
     canvas.save(fname)
 
 

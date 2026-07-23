@@ -38,7 +38,7 @@ can be selected with Matplotlib's notebook magic before plotting:
    %idsprint -u "imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/134174/117#core_profiles/profiles_1d[0]/electrons/temperature" -p
 
 Alternatively, the backend can be selected through the IDStools ``--rc``
-option:
+option before Matplotlib has been imported in the current kernel:
 
 .. code-block:: python
 
@@ -49,4 +49,3 @@ option:
 .. code-block:: python
 
    %plotequilibrium -u "imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/100507/5" --rc "backend='module://ipympl.backend_nbagg'"
-

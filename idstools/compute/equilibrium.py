@@ -1384,7 +1384,7 @@ class EquilibriumCompute:
             if ids_field.has_value:
                 quantities[attribute] = eval(f"self.ids.time_slice[{time_slice}].profiles_1d.{attribute}")
             else:
-                logger.error(f"self.ids.time_slice[{time_slice}].profiles_1d.{attribute} not found")
+                logger.warning(f"self.ids.time_slice[{time_slice}].profiles_1d.{attribute} not found")
         return quantities
 
     def get_global_quantities(self, time_slice=None, attributes=None):
