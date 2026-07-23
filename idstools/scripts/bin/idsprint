@@ -562,7 +562,10 @@ if __name__ == "__main__":
         table.add_column("SLICES", style="green")
         table.add_column("TIME", style="green")
         for ids_name, time_array in available_ids_and_times:
-            if len(time_array) == 1 and np.isnan(time_array[0]):
+            if time_array is None:
+                value = "N/A"
+                type = "unknown"
+            elif len(time_array) == 1 and np.isnan(time_array[0]):
                 value = f"{question_string}"
                 type = "heterogeneous IDS"
             elif len(time_array) == 1 and time_array[0] == -np.inf:
