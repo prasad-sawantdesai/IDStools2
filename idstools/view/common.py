@@ -1,72 +1,15 @@
-import ast
 import logging
 import os
 import sys
 
+from idstools.utils.matplotlib_backend import (
+    _configure_backend_from_cli_rc,
+    _is_jupyter,
+)
 
-def _backend_from_cli_rc(argv):
-    """Return a backend requested by a --rc backend=... command-line option."""
-    for index, argument in enumerate(argv):
-        if argument == "--rc" and index + 1 < len(argv):
-            rc_string = argv[index + 1]
-        elif argument.startswith("--rc="):
-            rc_string = argument.split("=", 1)[1]
-        else:
-            continue
-        for item in rc_string.split(";"):
-            key, separator, value = item.partition("=")
-            if separator and key.strip() == "backend":
-                value = value.strip()
-                try:
-                    value = ast.literal_eval(value)
-                except (SyntaxError, ValueError):
-                    pass
-                return str(value)
-    return None
-
-
-_requested_backend = _backend_from_cli_rc(sys.argv)
-if _requested_backend:
-    os.environ["MPLBACKEND"] = _requested_backend
+_configure_backend_from_cli_rc()
 
 import matplotlib  # noqa: E402 - backend env must be set before importing matplotlib
-
-
-def _is_jupyter() -> bool:
-    """Return True if running inside a Jupyter notebook/lab/Colab kernel."""
-    try:
-        from IPython import get_ipython
-
-        shell = get_ipython()
-        if shell is None:
-            return False
-        shell_class = shell.__class__.__name__
-        # ZMQInteractiveShell: Jupyter Notebook/Lab
-        # Shell: Google Colab
-        return shell_class in ("ZMQInteractiveShell", "Shell")
-    except ImportError:
-        return False
-
-
-if not os.environ.get("MPLBACKEND"):
-    if _is_jupyter():
-        if "matplotlib.pyplot" not in sys.modules:
-            try:
-                import ipympl  # noqa: F401 - imported to check availability
-
-                matplotlib.use("widget")
-            except ImportError:
-                matplotlib.use("agg")
-    elif sys.platform.startswith("win") or "DISPLAY" in os.environ:
-
-        try:
-            import tkinter  # noqa: F401 - imported to check availability
-
-            matplotlib.use("TkAgg")
-        except (ImportError, ModuleNotFoundError):
-            matplotlib.use("agg")
-    else:
-        matplotlib.use("agg")
 
 import matplotlib.pyplot as plt  # noqa: E402
 
@@ -266,8 +209,8 @@ class PlotCanvas:
             None
 
         Notes:
-            Uses the TkAgg backend for window resizing when available.
-            Other backends (agg, Qt) may not support window maximization.
+            Window maximization depends on the backend selected by Matplotlib.
+            Some backends may not support it.
 
         Examples:
             >>> canvas = PlotCanvas()
@@ -281,14 +224,14 @@ class PlotCanvas:
                 from IPython.display import display
 
                 display(self.fig)
-                if backend != "module://matplotlib_ipympl.backend_nbagg":
-                    plt.close("all")
+                if backend not in ("widget", "ipympl", "module://ipympl.backend_nbagg"):
+                    plt.close(self.fig)
             except ImportError:
                 pass
             return
         wm = self.get_current_fig_manager()
         try:
-            # Try to maximize the window (only works with TkAgg backend)
+            # Try to maximize the window when the active backend exposes one.
             window = wm.window
             screen_y = window.winfo_screenheight()
             screen_x = window.winfo_screenwidth()
