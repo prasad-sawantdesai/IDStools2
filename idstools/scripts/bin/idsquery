@@ -33,6 +33,7 @@ from rich.panel import Panel
 from rich.pretty import Pretty
 from rich_argparse import RichHelpFormatter
 
+from idstools.database import add_default_uda_cache_mode
 from idstools.utils.clihelper import (
     dbentry_parser,
 )
@@ -108,7 +109,12 @@ Example:
         valpath = path[1 + len(idsname) :]
         paths_info.append((path, idsname, valpath.replace("(", "[").replace(")", "]").replace("/", ".")))
 
-    ids_values = get_ids_values(args.uri, paths_info, dd_update=args.dd_update, verbose=args.verbose)
+    ids_values = get_ids_values(
+        add_default_uda_cache_mode(args.uri),
+        paths_info,
+        dd_update=args.dd_update,
+        verbose=args.verbose,
+    )
     if ids_values:
         for _path, _value in ids_values.items():
             if _value is None:

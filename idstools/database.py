@@ -13,6 +13,26 @@ import yaml
 logger = logging.getLogger(f"module.{__name__}")
 
 
+def add_default_uda_cache_mode(uri):
+    """Add ``cache_mode=none`` to UDA URIs unless it is already specified."""
+    if not isinstance(uri, str):
+        return uri
+
+    uri_part, fragment_separator, fragment = uri.partition("#")
+    location, query_separator, query = uri_part.partition("?")
+    backend = location.rsplit("/", 1)[-1].removeprefix("imas:")
+    if backend != "uda":
+        return uri
+
+    parameters = query.replace("&", ";").split(";") if query_separator else []
+    if any(parameter.partition("=")[0] == "cache_mode" for parameter in parameters):
+        return uri
+
+    parameter_separator = ";" if query_separator else "?"
+    uri_part = f"{uri_part}{parameter_separator}cache_mode=none"
+    return f"{uri_part}{fragment_separator}{fragment}"
+
+
 class DBMaster:
     ALL_BACKENDS = "mdsplus", "hdf5"
 
@@ -701,11 +721,12 @@ class DBMaster:
     def get_connection(cls, imasargs):
         connection = None
         if imasargs.uri != "" and imasargs.uri is not None:
+            uri = add_default_uda_cache_mode(imasargs.uri)
             if "mode" in imasargs.__dict__:
-                connection = imas.DBEntry(imasargs.uri, imasargs.mode)
+                connection = imas.DBEntry(uri, imasargs.mode)
             else:
                 try:
-                    connection = imas.DBEntry(imasargs.uri, "r")
+                    connection = imas.DBEntry(uri, "r")
                 except Exception as e:
                     print(e)
         return connection

@@ -18,6 +18,7 @@ from matplotlib.widgets import Slider
 from rich_argparse import RichHelpFormatter
 
 from idstools.compute.common import get_nearest_time
+from idstools.database import add_default_uda_cache_mode
 from idstools.utils.clihelper import (
     show_plot,
     rcparam_parser,
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     wall2 = None
 
     if len(args.uri) >= 1:
-        connection1 = imas.DBEntry(args.uri[0], "r")
+        connection1 = imas.DBEntry(add_default_uda_cache_mode(args.uri[0]), "r")
         if args.dd_update:
             equilibrium1 = connection1.get("equilibrium", autoconvert=False)
             equilibrium1 = imas.convert_ids(equilibrium1, connection1.factory.version)
@@ -110,7 +111,7 @@ if __name__ == "__main__":
             logger.critical("----> Could not open first data entry. Aborted.")
             exit(1)
     if len(args.uri) == 2:
-        connection2 = imas.DBEntry(args.uri[1], "r")
+        connection2 = imas.DBEntry(add_default_uda_cache_mode(args.uri[1]), "r")
         if args.dd_update:
             equilibrium2 = connection2.get("equilibrium", autoconvert=False)
             equilibrium2 = imas.convert_ids(equilibrium2, connection2.factory.version)
