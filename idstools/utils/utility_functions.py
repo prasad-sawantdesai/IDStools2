@@ -1,6 +1,23 @@
 import logging
+from urllib.parse import urlsplit, urlunsplit
 
 logger = logging.getLogger(f"module.{__name__}")
+
+
+def add_query_to_uri(uri: str, *, backend: str, query: str):
+    """Append a query pair when the URI uses the selected backend."""
+    uri_parts = urlsplit(uri)
+    uri_backend = uri_parts.path.rsplit("/", 1)[-1]
+    if uri_backend != backend:
+        return uri
+
+    updated_query = f"{uri_parts.query};{query}"
+    return urlunsplit(uri_parts._replace(query=updated_query))
+
+
+def add_default_uda_cache_mode(uri: str):
+    """Append ``cache_mode=none`` to UDA URIs."""
+    return add_query_to_uri(uri, backend="uda", query="cache_mode=none")
 
 
 def get_slice_from_array(arr, slice_str):

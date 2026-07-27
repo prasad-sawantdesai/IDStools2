@@ -33,7 +33,6 @@ from rich.panel import Panel
 from rich.pretty import Pretty
 from rich_argparse import RichHelpFormatter
 
-from idstools.database import add_default_uda_cache_mode
 from idstools.utils.clihelper import (
     dbentry_parser,
 )
@@ -42,6 +41,7 @@ from idstools.utils.idshelper import (
     get_ids_values,
 )
 from idstools.utils.idslogger import setup_logger
+from idstools.utils.utility_functions import add_default_uda_cache_mode
 
 logger = setup_logger("module", stdout_level=logging.INFO)
 

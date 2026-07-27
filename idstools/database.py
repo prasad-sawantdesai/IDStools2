@@ -10,27 +10,9 @@ except ImportError:
     import imas
 import yaml
 
+from idstools.utils.utility_functions import add_default_uda_cache_mode
+
 logger = logging.getLogger(f"module.{__name__}")
-
-
-def add_default_uda_cache_mode(uri):
-    """Add ``cache_mode=none`` to UDA URIs unless it is already specified."""
-    if not isinstance(uri, str):
-        return uri
-
-    uri_part, fragment_separator, fragment = uri.partition("#")
-    location, query_separator, query = uri_part.partition("?")
-    backend = location.rsplit("/", 1)[-1].removeprefix("imas:")
-    if backend != "uda":
-        return uri
-
-    parameters = query.replace("&", ";").split(";") if query_separator else []
-    if any(parameter.partition("=")[0] == "cache_mode" for parameter in parameters):
-        return uri
-
-    parameter_separator = ";" if query_separator else "?"
-    uri_part = f"{uri_part}{parameter_separator}cache_mode=none"
-    return f"{uri_part}{fragment_separator}{fragment}"
 
 
 class DBMaster:
