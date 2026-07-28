@@ -10,7 +10,7 @@ except ImportError:
     import imas
 import yaml
 
-from idstools.utils.utility_functions import add_default_uda_cache_mode
+from idstools.utils.utility_functions import add_query_to_uri
 
 logger = logging.getLogger(f"module.{__name__}")
 
@@ -703,7 +703,11 @@ class DBMaster:
     def get_connection(cls, imasargs):
         connection = None
         if imasargs.uri != "" and imasargs.uri is not None:
-            uri = add_default_uda_cache_mode(imasargs.uri)
+            uri = add_query_to_uri(
+                imasargs.uri,
+                backend="uda",
+                query="cache_mode=none",
+            )
             if "mode" in imasargs.__dict__:
                 connection = imas.DBEntry(uri, imasargs.mode)
             else:
