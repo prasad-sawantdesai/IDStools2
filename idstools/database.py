@@ -10,6 +10,8 @@ except ImportError:
     import imas
 import yaml
 
+from idstools.utils.utility_functions import add_query_to_uri
+
 logger = logging.getLogger(f"module.{__name__}")
 
 
@@ -701,11 +703,16 @@ class DBMaster:
     def get_connection(cls, imasargs):
         connection = None
         if imasargs.uri != "" and imasargs.uri is not None:
+            uri = add_query_to_uri(
+                imasargs.uri,
+                backend="uda",
+                query="cache_mode=none",
+            )
             if "mode" in imasargs.__dict__:
-                connection = imas.DBEntry(imasargs.uri, imasargs.mode)
+                connection = imas.DBEntry(uri, imasargs.mode)
             else:
                 try:
-                    connection = imas.DBEntry(imasargs.uri, "r")
+                    connection = imas.DBEntry(uri, "r")
                 except Exception as e:
                     print(e)
         return connection

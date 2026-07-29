@@ -1,6 +1,31 @@
 import logging
+from urllib.parse import urlsplit, urlunsplit
 
 logger = logging.getLogger(f"module.{__name__}")
+
+
+def add_query_to_uri(uri: str, *, query: str, backend=None):
+    """Add a query to the URI.
+
+    If a backend is given, add the query only when it matches the URI's
+    backend. Otherwise, return the original URI unchanged. When backend is
+    None, add the query to any URI.
+    """
+    uri_parts = urlsplit(uri)
+    uri_backend = uri_parts.path.rsplit("/", 1)[-1]
+    if backend is not None and uri_backend != backend:
+        return uri
+
+    updated_query = f"{uri_parts.query};{query}"
+    return urlunsplit(
+        (
+            uri_parts.scheme,
+            uri_parts.netloc,
+            uri_parts.path,
+            updated_query,
+            uri_parts.fragment,
+        )
+    )
 
 
 def get_slice_from_array(arr, slice_str):
