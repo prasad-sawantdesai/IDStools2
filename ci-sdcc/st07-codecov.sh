@@ -20,8 +20,13 @@ source "$VIRTUALENV_DIR"/bin/activate
 pip install --upgrade pip
 pip install .
 pip install coverage
+
+# create logs directory
+LOG_DIR="$PWD"/logs
+mkdir -p "$LOG_DIR"
+
 # run tests
-coverage run --source=idstools -m pytest idstools/test
+coverage run --source=idstools -m pytest --junit-xml="$LOG_DIR"/test_report.xml idstools/test
 
 # report
 coverage report -i
