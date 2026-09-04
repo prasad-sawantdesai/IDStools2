@@ -372,7 +372,7 @@ class WavesCompute:
                 # Convert to Python string to ensure matplotlib compatibility (prevents array-like interpretation)
                 antenna_name = self.ids.coherent_wave[iwave].identifier.antenna_name
                 # Use str() to convert numpy strings/arrays to Python str
-                if hasattr(antenna_name, 'item'):
+                if hasattr(antenna_name, "item"):
                     # If it has .item() method (numpy scalar), use it
                     single_ec_launcher_name[iwave] = str(antenna_name.item())
                 else:
