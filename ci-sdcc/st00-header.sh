@@ -6,10 +6,10 @@ shopt -s expand_aliases
 module purge
 
 # Check which modules env var is set
-if [ -n "$INTEL_MODULES" ]; then
+if [ -n "${INTEL_MODULES:-}" ]; then
     MODULES_LIST="$INTEL_MODULES"
     export ENVIRONEMNT_NAME="intel"
-elif [ -n "$FOSS_MODULES" ]; then
+elif [ -n "${FOSS_MODULES:-}" ]; then
     MODULES_LIST="$FOSS_MODULES"
     export ENVIRONEMNT_NAME="foss"
 else
