@@ -8,9 +8,6 @@ if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
 fi
 
-ENVIRONEMNT_NAME=env"$TOOLCHAIN_VERSION"_"$ACCESS_LAYER_VERSION"
-module unload IDStools
-
 python -m venv "$ENVIRONEMNT_NAME"
 
 . "$ENVIRONEMNT_NAME"/bin/activate

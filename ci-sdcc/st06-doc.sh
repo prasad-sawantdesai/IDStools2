@@ -11,7 +11,6 @@ if [[ "$(uname -n)" == *"bamboo"* ]]; then
 fi
 
 # module unload Python-bundle-PyPI
-ENVIRONEMNT_NAME=env"$TOOLCHAIN_VERSION"_"$ACCESS_LAYER_VERSION"
 
 # Create python virtual environment and install dependencies
 rm -rf "$ENVIRONEMNT_NAME"

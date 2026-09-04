@@ -8,8 +8,10 @@ module purge
 # Check which modules env var is set
 if [ -n "$INTEL_MODULES" ]; then
     MODULES_LIST="$INTEL_MODULES"
+    export ENVIRONEMNT_NAME="intel"
 elif [ -n "$FOSS_MODULES" ]; then
     MODULES_LIST="$FOSS_MODULES"
+    export ENVIRONEMNT_NAME="foss"
 else
     echo ""
     echo "ERROR: Neither INTEL_MODULES nor FOSS_MODULES is set"
