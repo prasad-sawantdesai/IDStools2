@@ -32,8 +32,7 @@ else
     echo "  For foss-2025b:"
     echo "    export FOSS_MODULES=\"IMAS-Core/5.7.1-foss-2025b Tkinter/3.13.5-GCCcore-14.3.0 IMAS-Python/2.3.0-foss-2025b PyYAML/6.0.2-GCCcore-14.3.0\""
     echo ""
-    export ENVIRONEMNT_NAME="unset"
-    return 1
+    exit 1
 fi
 
 # Load all modules
