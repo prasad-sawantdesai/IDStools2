@@ -2,7 +2,7 @@
 # Bamboo CI script to create build information for easybuild
 # Execute script from root directory
 
-source ./ci-sdcc/st00-header.sh $1 $2
+source ./ci-sdcc/st00-header.sh
 
 # if successuful create hash and store in actor directory
 COMMITHASH=$(git rev-parse HEAD)

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bamboo CI script to test IDS tools on different toolchains
 # Execute script from root directory
-source ./ci-sdcc/st00-header.sh $1 $2 $3
+source ./ci-sdcc/st00-header.sh
 
 ENVIRONEMNT_NAME=env"$TOOLCHAIN_VERSION"_"$ACCESS_LAYER_VERSION"
 

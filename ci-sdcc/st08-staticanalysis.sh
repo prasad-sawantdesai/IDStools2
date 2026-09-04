@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bamboo CI script to test IDS tools on different toolchains
 # Execute script from root directory
-source ./ci-sdcc/st00-header.sh $1 $2
+source ./ci-sdcc/st00-header.sh
 
 # Note Disable set -e option when using on local as it will exit the shell on error
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
